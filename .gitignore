@@ -1,0 +1,37 @@
+# Java
+*.class
+*.log
+*.jar
+*.war
+*.ear
+target/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+
+# Database
+*.db
+*.sqlite
+auction.db
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Maven
+.mvn/
+mvnw
+mvnw.cmd
+
+# Logs
+logs/
+*.log
+
+# Environment
+.env
+.env.local
