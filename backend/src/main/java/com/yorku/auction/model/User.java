@@ -24,16 +24,59 @@ public class User {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
     
+    @Column(nullable = false)
+    private String username;
+    
+    @Column(nullable = false)
+    private String firstName;
+    
+    @Column(nullable = false)
+    private String lastName;
+    
+    @Column(nullable = false)
+    private String streetName;
+    
+    @Column(nullable = false)
+    private String streetNumber;
+    
+    @Column(nullable = false)
+    private String city;
+    
+    @Column(nullable = false)
+    private String country;
+    
+    @Column(nullable = false)
+    private String postalCode;
+    
     // Constructors
     public User() {
         this.createdAt = LocalDateTime.now();
     }
     
-    public User(String email, String password, String role) {
+    public User(String email, 
+    			String password, 
+    			String role, 
+				String username, 
+				String firstName, 
+				String lastName, 
+				String streetName, 
+				String streetNumber, 
+				String city, 
+				String country, 
+				String postalCode) {
+    	
         this.email = email;
         this.password = password;
         this.role = role;
         this.createdAt = LocalDateTime.now();
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.streetName = streetName;
+        this.streetNumber = streetNumber;
+        this.city = city;
+        this.country = country;
+        this.postalCode = postalCode;
     }
     
     // Getters and Setters
@@ -76,4 +119,68 @@ public class User {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+    
+    public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public String getStreetName() {
+		return streetName;
+	}
+
+	public void setStreetName(String streetName) {
+		this.streetName = streetName;
+	}
+
+	public String getStreetNumber() {
+		return streetNumber;
+	}
+
+	public void setStreetNumber(String streetNumber) {
+		this.streetNumber = streetNumber;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getCountry() {
+		return country;
+	}
+
+	public void setCountry(String country) {
+		this.country = country;
+	}
+
+	public String getPostalCode() {
+		return postalCode;
+	}
+
+	public void setPostalCode(String postalCode) {
+		this.postalCode = postalCode;
+	}
 }
