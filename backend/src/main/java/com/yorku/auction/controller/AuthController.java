@@ -34,6 +34,14 @@ public class AuthController {
             response.put("userId", user.getUserId());
             response.put("email", user.getEmail());
             response.put("role", user.getRole());
+            response.put("username", user.getUsername());
+            response.put("First Name", user.getFirstName());
+            response.put("Last Name", user.getLastName());
+            response.put("Street Name", user.getStreetName());
+            response.put("Street Number",user.getStreetNumber());
+            response.put("City", user.getCity());
+            response.put("Country", user.getCountry());
+            response.put("Postal Code",user.getPostalCode());
             
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (RuntimeException e) {
@@ -54,6 +62,14 @@ public class AuthController {
             response.put("userId", user.getUserId());
             response.put("email", user.getEmail());
             response.put("role", user.getRole());
+            response.put("username", user.getUsername());
+            response.put("First Name", user.getFirstName());
+            response.put("Last Name", user.getLastName());
+            response.put("Street Name", user.getStreetName());
+            response.put("Street Number",user.getStreetNumber());
+            response.put("City", user.getCity());
+            response.put("Country", user.getCountry());
+            response.put("Postal Code",user.getPostalCode());
             
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
