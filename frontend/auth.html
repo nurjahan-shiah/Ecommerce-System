@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In / Sign Up - Auction System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            max-width: 900px;
+            width: 100%;
+            display: flex;
+        }
+
+        .left-panel {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .left-panel h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .left-panel p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        .right-panel {
+            flex: 1;
+            padding: 60px 40px;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #999;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab:hover {
+            color: #667eea;
+        }
+
+        .form-container {
+            display: none;
+        }
+
+        .form-container.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .message {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+            animation: slideDown 0.3s;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .role-info {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .left-panel {
+                padding: 40px 30px;
+            }
+
+            .left-panel h1 {
+                font-size: 2em;
+            }
+
+            .right-panel {
+                padding: 40px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Panel -->
+        <div class="left-panel">
+            <h1>🏛️ Auction System</h1>
+            <p>Welcome to Team Atlas's Forward Auction E-Commerce Platform. Join our community of buyers and sellers today!</p>
+            <p style="margin-top: 20px; font-size: 0.9em;">EECS 4413 - York University</p>
+        </div>
+
+        <!-- Right Panel -->
+        <div class="right-panel">
+            <!-- Tabs -->
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('signin')">Sign In</div>
+                <div class="tab" onclick="switchTab('signup')">Sign Up</div>
+            </div>
+
+            <!-- Sign In Form -->
+            <div id="signin-form" class="form-container active">
+                <div id="signin-message" class="message"></div>
+                <form onsubmit="handleSignIn(event)">
+                    <div class="form-group">
+                        <label for="signin-email">Email Address</label>
+                        <input type="email" id="signin-email" required placeholder="your@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="signin-password">Password</label>
+                        <input type="password" id="signin-password" required placeholder="••••••••">
+                    </div>
+                    <button type="submit">Sign In</button>
+                </form>
+            </div>
+
+            <!-- Sign Up Form -->
+            <div id="signup-form" class="form-container">
+                <div id="signup-message" class="message"></div>
+                <form onsubmit="handleSignUp(event)">
+                    <div class="form-group">
+                        <label for="signup-email">Email Address</label>
+                        <input type="email" id="signup-email" required placeholder="your@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-password">Password</label>
+                        <input type="password" id="signup-password" required placeholder="••••••••" minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-role">Account Type</label>
+                        <select id="signup-role" required>
+                            <option value="BUYER">Buyer - I want to bid on items</option>
+                            <option value="SELLER">Seller - I want to sell items</option>
+                        </select>
+                        <div class="role-info">You can always change this later in your profile</div>
+                    </div>
+                    <button type="submit">Create Account</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080/api';
+
+        // Switch between Sign In and Sign Up tabs
+        function switchTab(tab) {
+            // Update tab active state
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update form visibility
+            document.querySelectorAll('.form-container').forEach(f => f.classList.remove('active'));
+            document.getElementById(`${tab}-form`).classList.add('active');
+
+            // Clear messages
+            clearMessages();
+        }
+
+        // Handle Sign In
+        async function handleSignIn(event) {
+            event.preventDefault();
+            clearMessages();
+
+            const email = document.getElementById('signin-email').value;
+            const password = document.getElementById('signin-password').value;
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage('signin', 'success', `Welcome back! Logged in as ${data.role}`);
+                    
+                    // Store user info (in real app, use proper session management)
+                    localStorage.setItem('user', JSON.stringify(data));
+                    
+                    // Redirect after 1.5 seconds
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1500);
+                } else {
+                    showMessage('signin', 'error', data.error || 'Invalid email or password');
+                }
+            } catch (error) {
+                showMessage('signin', 'error', 'Network error. Please check if the server is running.');
+                console.error('Error:', error);
+            }
+        }
+
+        // Handle Sign Up
+        async function handleSignUp(event) {
+            event.preventDefault();
+            clearMessages();
+
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const role = document.getElementById('signup-role').value;
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/signup`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password, role })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage('signup', 'success', 'Account created successfully! Redirecting to sign in...');
+                    
+                    // Clear form
+                    event.target.reset();
+                    
+                    // Switch to sign in tab after 2 seconds
+                    setTimeout(() => {
+                        document.querySelector('.tab:first-child').click();
+                        document.getElementById('signin-email').value = email;
+                    }, 2000);
+                } else {
+                    showMessage('signup', 'error', data.error || 'Failed to create account');
+                }
+            } catch (error) {
+                showMessage('signup', 'error', 'Network error. Please check if the server is running.');
+                console.error('Error:', error);
+            }
+        }
+
+        // Show message
+        function showMessage(form, type, text) {
+            const messageEl = document.getElementById(`${form}-message`);
+            messageEl.textContent = text;
+            messageEl.className = `message ${type} show`;
+        }
+
+        // Clear all messages
+        function clearMessages() {
+            document.querySelectorAll('.message').forEach(msg => {
+                msg.classList.remove('show');
+            });
+        }
+
+        // Check if user is already logged in
+        window.addEventListener('load', () => {
+            const user = localStorage.getItem('user');
+            if (user) {
+                const userData = JSON.parse(user);
+                showMessage('signin', 'success', `You're already logged in as ${userData.role}`);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -12,23 +12,14 @@ public class User {
     @Column(name = "user_id")
     private Long userId;
     
-    @Column(unique = true, nullable = false, length = 50)
-    private String username;
+    @Column(unique = true, nullable = false)
+    private String email;
     
     @Column(nullable = false)
     private String password;
     
-    @Column(name = "first_name", nullable = false, length = 50)
-    private String firstName;
-    
-    @Column(name = "last_name", nullable = false, length = 50)
-    private String lastName;
-    
-    @Column(length = 50)
-    private String city;
-    
-    @Column(length = 50)
-    private String country;
+    @Column(length = 20)
+    private String role = "BUYER"; // BUYER or SELLER
     
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -38,11 +29,10 @@ public class User {
         this.createdAt = LocalDateTime.now();
     }
     
-    public User(String username, String password, String firstName, String lastName) {
-        this.username = username;
+    public User(String email, String password, String role) {
+        this.email = email;
         this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.role = role;
         this.createdAt = LocalDateTime.now();
     }
     
@@ -55,12 +45,12 @@ public class User {
         this.userId = userId;
     }
     
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return email;
     }
     
-    public void setUsername(String username) {
-        this.username = username;
+    public void setEmail(String email) {
+        this.email = email;
     }
     
     public String getPassword() {
@@ -71,36 +61,12 @@ public class User {
         this.password = password;
     }
     
-    public String getFirstName() {
-        return firstName;
+    public String getRole() {
+        return role;
     }
     
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-    
-    public String getLastName() {
-        return lastName;
-    }
-    
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-    
-    public String getCity() {
-        return city;
-    }
-    
-    public void setCity(String city) {
-        this.city = city;
-    }
-    
-    public String getCountry() {
-        return country;
-    }
-    
-    public void setCountry(String country) {
-        this.country = country;
+    public void setRole(String role) {
+        this.role = role;
     }
     
     public LocalDateTime getCreatedAt() {
