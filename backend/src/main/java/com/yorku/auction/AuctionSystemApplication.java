@@ -11,6 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class AuctionSystemApplication {
 
     public static void main(String[] args) {
+    	
         SpringApplication.run(AuctionSystemApplication.class, args);
         System.out.println("========================================");
         System.out.println("Auction System Started Successfully!");
