@@ -28,16 +28,16 @@ public class User {
     private String username;
     
     @Column(nullable = false)
-    private String firstName;
+    private String first_name;
     
     @Column(nullable = false)
-    private String lastName;
+    private String last_name;
     
     @Column(nullable = false)
-    private String streetName;
+    private String street_name;
     
     @Column(nullable = false)
-    private String streetNumber;
+    private String street_number;
     
     @Column(nullable = false)
     private String city;
@@ -46,7 +46,7 @@ public class User {
     private String country;
     
     @Column(nullable = false)
-    private String postalCode;
+    private String postal_code;
     
     // Constructors
     public User() {
@@ -57,26 +57,26 @@ public class User {
     			String password, 
     			String role, 
 				String username, 
-				String firstName, 
-				String lastName, 
-				String streetName, 
-				String streetNumber, 
+				String first_name, 
+				String last_name, 
+				String street_name, 
+				String street_number, 
 				String city, 
 				String country, 
-				String postalCode) {
+				String postal_code) {
     	
         this.email = email;
         this.password = password;
         this.role = role;
         this.createdAt = LocalDateTime.now();
         this.username = username;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.streetName = streetName;
-        this.streetNumber = streetNumber;
+        this.first_name = first_name;
+        this.last_name = last_name;
+        this.street_name = street_name;
+        this.street_number = street_number;
         this.city = city;
         this.country = country;
-        this.postalCode = postalCode;
+        this.postal_code = postal_code;
     }
     
     // Getters and Setters
@@ -128,36 +128,36 @@ public class User {
 		this.username = username;
 	}
 
-	public String getFirstName() {
-		return firstName;
+	public String getFirst_name() {
+		return first_name;
 	}
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
+	public void setFirst_name(String first_name) {
+		this.first_name = first_name;
 	}
 
-	public String getLastName() {
-		return lastName;
+	public String getLast_name() {
+		return last_name;
 	}
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
+	public void setLast_name(String last_name) {
+		this.last_name = last_name;
 	}
 
-	public String getStreetName() {
-		return streetName;
+	public String getStreet_name() {
+		return street_name;
 	}
 
-	public void setStreetName(String streetName) {
-		this.streetName = streetName;
+	public void setStreet_name(String street_name) {
+		this.street_name = street_name;
 	}
 
-	public String getStreetNumber() {
-		return streetNumber;
+	public String getStreet_number() {
+		return street_number;
 	}
 
-	public void setStreetNumber(String streetNumber) {
-		this.streetNumber = streetNumber;
+	public void setStreet_number(String street_number) {
+		this.street_number = street_number;
 	}
 
 	public String getCity() {
@@ -176,11 +176,11 @@ public class User {
 		this.country = country;
 	}
 
-	public String getPostalCode() {
-		return postalCode;
+	public String getPostal_code() {
+		return postal_code;
 	}
 
-	public void setPostalCode(String postalCode) {
-		this.postalCode = postalCode;
+	public void setPostal_code(String postal_code) {
+		this.postal_code = postal_code;
 	}
 }

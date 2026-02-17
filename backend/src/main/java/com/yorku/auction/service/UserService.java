@@ -34,13 +34,13 @@ public class UserService {
         user.setPassword(request.getPassword()); // NOTE: plaintext for Deliverable 2
         user.setRole(request.getRole() != null ? request.getRole() : "BUYER");
         user.setUsername(request.getUsername());
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
-        user.setStreetName(request.getStreetName());
-        user.setStreetNumber(request.getStreetNumber());
+        user.setFirst_name(request.getFirst_name());
+        user.setLast_name(request.getLast_name());
+        user.setStreet_name(request.getStreet_name());
+        user.setStreet_number(request.getStreet_number());
         user.setCity(request.getCity());
         user.setCountry(request.getCountry());
-        user.setPostalCode(request.getPostalCode());
+        user.setPostal_code(request.getPostal_code());
         
         return userRepository.save(user);
     }
