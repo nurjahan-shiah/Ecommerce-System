@@ -41,13 +41,13 @@ public class AuthController {
             response.put("email", user.getEmail());
             response.put("role", user.getRole());
             response.put("username", user.getUsername());
-            response.put("First Name", user.getFirstName());
-            response.put("Last Name", user.getLastName());
-            response.put("Street Name", user.getStreetName());
-            response.put("Street Number",user.getStreetNumber());
+            response.put("First Name", user.getFirst_name());
+            response.put("Last Name", user.getLast_name());
+            response.put("Street Name", user.getStreet_name());
+            response.put("Street Number",user.getStreet_number());
             response.put("City", user.getCity());
             response.put("Country", user.getCountry());
-            response.put("Postal Code",user.getPostalCode());
+            response.put("Postal Code",user.getPostal_code());
             
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (RuntimeException e) {
@@ -69,13 +69,13 @@ public class AuthController {
             response.put("email", user.getEmail());
             response.put("role", user.getRole());
             response.put("username", user.getUsername());
-            response.put("First Name", user.getFirstName());
-            response.put("Last Name", user.getLastName());
-            response.put("Street Name", user.getStreetName());
-            response.put("Street Number",user.getStreetNumber());
+            response.put("First Name", user.getFirst_name());
+            response.put("Last Name", user.getLast_name());
+            response.put("Street Name", user.getStreet_name());
+            response.put("Street Number",user.getStreet_number());
             response.put("City", user.getCity());
             response.put("Country", user.getCountry());
-            response.put("Postal Code",user.getPostalCode());
+            response.put("Postal Code",user.getPostal_code());
             
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
