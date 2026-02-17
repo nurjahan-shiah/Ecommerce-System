@@ -16,5 +16,6 @@ public class AuctionSystemApplication {
         System.out.println("Auction System Started Successfully!");
         System.out.println("Access at: http://localhost:8080");
         System.out.println("========================================");
+        
     }
 }
