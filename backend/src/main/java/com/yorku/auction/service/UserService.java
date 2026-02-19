@@ -34,6 +34,18 @@ public class UserService {
         user.setPassword(request.getPassword()); // NOTE: plaintext for Deliverable 2
         user.setRole(request.getRole() != null ? request.getRole() : "BUYER");
         
+        // --- REQUIRED placeholders (because DB columns are NOT NULL) ---
+        long ts = System.currentTimeMillis();
+        user.setUsername("temp_" + ts);
+        user.setFirst_name("TBD");
+        user.setLast_name("TBD");
+        user.setStreet_name("TBD");
+        user.setStreet_number("TBD");
+        user.setCity("TBD");
+        user.setCountry("TBD");
+        user.setPostal_code("TBD");
+
+        
         return userRepository.save(user);
     }
     
@@ -76,19 +88,46 @@ public class UserService {
     public User updateUser(Long id, User updatedUser) {
         return userRepository.findById(id)
                 .map(existingUser -> {
-                    if (updatedUser.getEmail() != null) {
+
+                    if (updatedUser.getEmail() != null && !updatedUser.getEmail().isBlank()) {
                         existingUser.setEmail(updatedUser.getEmail());
                     }
-                    if (updatedUser.getPassword() != null) {
+                    if (updatedUser.getPassword() != null && !updatedUser.getPassword().isBlank()) {
                         existingUser.setPassword(updatedUser.getPassword());
                     }
-                    if (updatedUser.getRole() != null) {
+                    if (updatedUser.getRole() != null && !updatedUser.getRole().isBlank()) {
                         existingUser.setRole(updatedUser.getRole());
                     }
+
+                    if (updatedUser.getUsername() != null && !updatedUser.getUsername().isBlank())
+                        existingUser.setUsername(updatedUser.getUsername());
+
+                    if (updatedUser.getFirst_name() != null && !updatedUser.getFirst_name().isBlank())
+                        existingUser.setFirst_name(updatedUser.getFirst_name());
+
+                    if (updatedUser.getLast_name() != null && !updatedUser.getLast_name().isBlank())
+                        existingUser.setLast_name(updatedUser.getLast_name());
+
+                    if (updatedUser.getStreet_name() != null && !updatedUser.getStreet_name().isBlank())
+                        existingUser.setStreet_name(updatedUser.getStreet_name());
+
+                    if (updatedUser.getStreet_number() != null && !updatedUser.getStreet_number().isBlank())
+                        existingUser.setStreet_number(updatedUser.getStreet_number());
+
+                    if (updatedUser.getCity() != null && !updatedUser.getCity().isBlank())
+                        existingUser.setCity(updatedUser.getCity());
+
+                    if (updatedUser.getCountry() != null && !updatedUser.getCountry().isBlank())
+                        existingUser.setCountry(updatedUser.getCountry());
+
+                    if (updatedUser.getPostal_code() != null && !updatedUser.getPostal_code().isBlank())
+                        existingUser.setPostal_code(updatedUser.getPostal_code());
+
                     return userRepository.save(existingUser);
                 })
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
     }
+
     
     public void deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
