@@ -69,3 +69,14 @@ CREATE TABLE IF NOT EXISTS payments (
     FOREIGN KEY (auction_id) REFERENCES auctions(auction_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
+
+-- UC2.3: One selected auction per login session
+CREATE TABLE IF NOT EXISTS session_selection (
+    session_id TEXT PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    selected_auction_id INTEGER NOT NULL,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (selected_auction_id) REFERENCES auctions(auction_id)
+);
+
