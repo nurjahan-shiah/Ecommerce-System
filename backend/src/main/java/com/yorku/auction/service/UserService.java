@@ -31,7 +31,7 @@ public class UserService {
         // Create new user
         User user = new User();
         user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword()); // NOTE: plaintext for Deliverable 2
+        user.setPassword(request.getPassword()); 
         user.setRole(request.getRole() != null ? request.getRole() : "BUYER");
         user.setUsername(request.getUsername());
         user.setFirst_name(request.getFirst_name());

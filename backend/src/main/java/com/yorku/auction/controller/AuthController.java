@@ -3,7 +3,6 @@ package com.yorku.auction.controller;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -11,12 +10,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.yorku.auction.dto.LoginRequest;
 import com.yorku.auction.dto.SignupRequest;
 import com.yorku.auction.model.User;
 import com.yorku.auction.service.UserService;
-
 import jakarta.validation.Valid;
 
 @RestController
@@ -31,13 +28,13 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@Valid @RequestBody SignupRequest request) {
+    public ResponseEntity<?> signup(@RequestBody SignupRequest request) {
         try {
             User user = userService.register(request);
 
             Map<String, Object> response = new HashMap<>();
             response.put("message", "User registered successfully");
-            response.put("userId", user.getUserId());
+            response.put("userId", user.getUser_id());
             response.put("email", user.getEmail());
             response.put("role", user.getRole());
             response.put("username", user.getUsername());
@@ -62,14 +59,12 @@ public class AuthController {
         try {
             User user = userService.login(request);
 
-            // NEW: generate a login session id (for UC2.3 single selection per login session)
             String sessionId = UUID.randomUUID().toString();
 
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Login successful");
-            response.put("sessionId", sessionId); // NEW
-
-            response.put("userId", user.getUserId());
+            response.put("sessionId", sessionId);
+            response.put("userId", user.getUser_id());
             response.put("email", user.getEmail());
             response.put("role", user.getRole());
             response.put("username", user.getUsername());
