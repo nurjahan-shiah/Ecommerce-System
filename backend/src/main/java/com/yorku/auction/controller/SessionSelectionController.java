@@ -20,7 +20,7 @@ public class SessionSelectionController {
         this.selectionService = selectionService;
     }
 
-    // UC2.3 set selection (ONE per session)
+    //set selection (one per session)
     @PostMapping("/selection")
     public ResponseEntity<?> setSelection(
             @RequestHeader("X-Session-Id") String sessionId,

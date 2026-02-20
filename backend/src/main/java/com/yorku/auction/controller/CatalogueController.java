@@ -18,13 +18,13 @@ public class CatalogueController {
         this.catalogueService = catalogueService;
     }
 
-    // UC2.2 initial load
+    //items active initial load
     @GetMapping("/items/active")
     public ResponseEntity<List<CatalogueItemResponse>> active() {
         return ResponseEntity.ok(catalogueService.getActiveAuctions(null));
     }
 
-    // UC2.1 search
+    //search item
     @GetMapping("/items")
     public ResponseEntity<List<CatalogueItemResponse>> search(@RequestParam(required = false) String keyword) {
         return ResponseEntity.ok(catalogueService.getActiveAuctions(keyword));

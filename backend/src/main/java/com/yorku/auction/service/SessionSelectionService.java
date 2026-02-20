@@ -14,7 +14,7 @@ public class SessionSelectionService {
         this.jdbc = jdbc;
     }
 
-    // upsert = enforce single selection per session
+    //enforce single selection per session
     public void setSelection(String sessionId, Long userId, Long auctionId) {
         String sql =
             "INSERT INTO session_selection(session_id, user_id, selected_auction_id) " +
