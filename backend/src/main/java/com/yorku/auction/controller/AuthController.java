@@ -75,6 +75,7 @@ public class AuthController {
             response.put("city", user.getCity());
             response.put("country", user.getCountry());
             response.put("postal_code", user.getPostal_code());
+            
 
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
