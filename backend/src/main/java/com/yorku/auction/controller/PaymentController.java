@@ -21,10 +21,7 @@ public class PaymentController {
         this.paymentService = paymentService;
     }
 
-    /**
-     * UC4/UC5: Pay Now endpoint
-     * Only winner can pay for ended auction with optional expedited shipping
-     */
+    // pay now endpoint
     @PostMapping("/pay")
     public ResponseEntity<?> payNow(
             @RequestHeader("X-Session-Id") String sessionId,
@@ -44,25 +41,6 @@ public class PaymentController {
             );
             return ResponseEntity.ok(response);
 
-        } catch (RuntimeException e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("error", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-        }
-    }
-
-    /**
-     * GET payment status for a specific auction (bonus endpoint)
-     */
-    @GetMapping("/{auctionId}")
-    public ResponseEntity<?> getPaymentStatus(@PathVariable Long auctionId,
-                                            @RequestHeader("X-User-Id") Long userId) {
-        try {
-            // This would call a service method to check payment status
-            Map<String, Object> status = new HashMap<>();
-            status.put("auctionId", auctionId);
-            status.put("status", "COMPLETED"); // Placeholder
-            return ResponseEntity.ok(status);
         } catch (RuntimeException e) {
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("error", e.getMessage());

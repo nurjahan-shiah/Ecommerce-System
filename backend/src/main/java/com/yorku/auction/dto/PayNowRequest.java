@@ -8,8 +8,8 @@ public class PayNowRequest {
     private String cardName;
     private String expiryDate;
     private String securityCode;
-    // getters/setters
-	public String getSecurityCode() {
+
+    public String getSecurityCode() {
 		return securityCode;
 	}
 	public void setSecurityCode(String securityCode) {

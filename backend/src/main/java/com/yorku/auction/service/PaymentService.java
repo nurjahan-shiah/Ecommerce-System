@@ -16,10 +16,6 @@ public class PaymentService {
         this.jdbc = jdbc;
     }
 
-    /**
-     * UC4 / UC5: Pay Now for an ended auction.
-     * Only the highest bidder can pay. Supports expedited shipping.
-     */
     @Transactional
     public Map<String, Object> payNow(String sessionId,
                                       Long userId,
@@ -32,22 +28,24 @@ public class PaymentService {
 
         Map<String, Object> resp = new HashMap<>();
 
-        // 1) Validate session selection (UC2.3)
+        // Validate session selection
         Long selectedAuctionId = jdbc.query(
                 "SELECT selected_auction_id FROM session_selection WHERE session_id = ?",
                 new Object[]{sessionId},
                 rs -> rs.next() ? rs.getLong("selected_auction_id") : null
         );
-
+        
+        // auction not selected
         if (selectedAuctionId == null) {
             throw new RuntimeException("No auction selected for this session. Select an item first.");
         }
 
+        // selected doesnt match requested
         if (!selectedAuctionId.equals(auctionId)) {
             throw new RuntimeException("Selected auction does not match requested auction.");
         }
 
-        // 2) Fetch auction state - check ended status
+        // get the auction and it's status
         Map<String, Object> auction = jdbc.queryForMap(
                 "SELECT auction_id, item_id, current_price, status, " +
                         "highest_bidder_id, " +
@@ -64,25 +62,28 @@ public class PaymentService {
         long endEpoch = ((Number) auction.get("endepoch")).longValue();
         long nowEpoch = System.currentTimeMillis() / 1000;
 
-        // Auto-mark as ENDED if time expired
+        // mark it as ended if the time expired
         if (nowEpoch >= endEpoch && "ACTIVE".equalsIgnoreCase(status)) {
             jdbc.update("UPDATE auctions SET status = 'ENDED' WHERE auction_id = ?", auctionId);
             status = "ENDED";
         }
-
+        
+        // checks if the auction is completed (paid for)
         if ("COMPLETED".equalsIgnoreCase(status)) {
             throw new RuntimeException("Auction completed and has already been paid for");
         }
+        
+        // checks if the auction is not ended yet
         if (!"ENDED".equalsIgnoreCase(status)) {
             throw new RuntimeException("Auction is not ENDED. Cannot pay yet.");
         }
 
-        // 3) Verify only winner can pay
+        // verify the requested payer is the winner
         if (highestBidderId == null || !highestBidderId.equals(userId)) {
             throw new RuntimeException("You are not the winning bidder for this auction. - Userid "+userId+" expecting "+highestBidderId);
         }
 
-        // 4) Fetch item shipping details
+        // get the shipping details
         Long itemId = ((Number) auction.get("item_id")).longValue();
         Map<String, Object> item = jdbc.queryForMap(
                 "SELECT item_name, shipping_price, expedited_shipping_price, shipping_days " +
@@ -103,7 +104,7 @@ public class PaymentService {
                 : shippingPrice;
         double totalAmount = currentPrice + shippingCost;
 
-        // 5) Fetch user shipping address
+        // get the user's shipping address
         Map<String, Object> user = jdbc.queryForMap(
                 "SELECT first_name, last_name, street_number, street_name, " +
                         "city, country, postal_code " +
@@ -126,7 +127,7 @@ public class PaymentService {
         if (postalCode != null) address.append(postalCode);
         String fullAddress = address.toString().replaceAll(",\\s+", ", ").trim();
 
-        // 6) Record payment (assume success for this milestone)
+        // record the payment in the payments database
         jdbc.update(
                 "INSERT INTO payments (auction_id, user_id, total_amount, card_number, card_name, " +
                         "expedited_shipping, payment_status) " +
@@ -135,10 +136,10 @@ public class PaymentService {
                 expeditedShipping ? 1 : 0, "COMPLETED"
         );
 
-        // 7) Mark auction as paid
+        // mark the auction as completed
         jdbc.update("UPDATE auctions SET status = 'COMPLETED' WHERE auction_id = ?", auctionId);
 
-        // 8) Success response for frontend
+        // response for the Front end
         resp.put("message", "Payment completed successfully");
         resp.put("auctionId", auctionId);
         resp.put("itemName", itemName);
