@@ -3,6 +3,7 @@ package com.yorku.auction.service;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -25,12 +26,23 @@ public class SessionSelectionService {
         jdbc.update(sql, sessionId, userId, auctionId);
     }
 
-    public Optional<Long> getSelection(String sessionId) {
-        String sql = "SELECT selected_auction_id FROM session_selection WHERE session_id = ?";
-        return jdbc.query(sql, new Object[]{sessionId}, rs -> {
-            if (rs.next()) return Optional.of(rs.getLong("selected_auction_id"));
+    public Optional<Map<String, Object>> getSelection(String sessionId) {
+        String sql = """
+            SELECT a.auction_id, a.item_id, a.current_price, a.status, a.highest_bidder_id,
+                   a.end_time, ci.item_name, ci.shipping_price, ci.expedited_shipping_price,
+                   ci.shipping_days, u.first_name || ' ' || u.last_name as seller_name
+            FROM session_selection ss
+            JOIN auctions a ON ss.selected_auction_id = a.auction_id
+            JOIN catalogue_items ci ON a.item_id = ci.item_id
+            JOIN users u ON a.seller_id = u.user_id
+            WHERE ss.session_id = ?
+            """;
+        
+        try {
+            return Optional.ofNullable(jdbc.queryForMap(sql, sessionId));
+        } catch (Exception e) {
             return Optional.empty();
-        });
+        }
     }
 
     public void clearSelection(String sessionId) {

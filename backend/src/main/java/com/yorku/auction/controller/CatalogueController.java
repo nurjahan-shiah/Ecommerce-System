@@ -23,10 +23,18 @@ public class CatalogueController {
     public ResponseEntity<List<CatalogueItemResponse>> active() {
         return ResponseEntity.ok(catalogueService.getActiveAuctions(null));
     }
+    
+    //items inactive initial load
+    @GetMapping("/items/inactive")
+    public ResponseEntity<List<CatalogueItemResponse>> inactive() {
+        return ResponseEntity.ok(catalogueService.getInactiveAuctions(null));
+    }
 
     //search item
     @GetMapping("/items")
     public ResponseEntity<List<CatalogueItemResponse>> search(@RequestParam(required = false) String keyword) {
         return ResponseEntity.ok(catalogueService.getActiveAuctions(keyword));
     }
+    
+    
 }
