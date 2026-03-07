@@ -34,8 +34,17 @@ public class AuctionService {
         itemId = jdbc.queryForObject("SELECT last_insert_rowid()", Long.class);
     }
 
-    // get the end time
-    long endTimeSeconds = System.currentTimeMillis() / 1000 + (request.getDurationHours() * 3600L);
+    // get the end time (support short test windows via durationMinutes)
+    long nowSeconds = System.currentTimeMillis() / 1000;
+    long durationSeconds;
+    if (request.getDurationMinutes() != null && request.getDurationMinutes() > 0) {
+        durationSeconds = Math.round(request.getDurationMinutes() * 60.0);
+    } else if (request.getDurationHours() != null && request.getDurationHours() > 0) {
+        durationSeconds = request.getDurationHours() * 3600L;
+    } else {
+        throw new IllegalArgumentException("Provide a positive durationMinutes or durationHours.");
+    }
+    long endTimeSeconds = nowSeconds + durationSeconds;
 
     // create the auction
     jdbc.update(

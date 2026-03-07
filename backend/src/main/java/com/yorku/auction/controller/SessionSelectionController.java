@@ -38,7 +38,7 @@ public class SessionSelectionController {
     @GetMapping("/selection")
     public ResponseEntity<?> getSelection(@RequestHeader("X-Session-Id") String sessionId) {
         Map<String, Object> resp = new HashMap<>();
-        resp.putAll(selectionService.getSelection(sessionId).orElse(null));
+        selectionService.getSelection(sessionId).ifPresent(resp::putAll);
         return ResponseEntity.ok(resp);
     }
 

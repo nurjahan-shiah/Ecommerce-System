@@ -13,9 +13,10 @@ public class CreateAuctionRequest {
     @DecimalMin(value = "0.0", inclusive = false)
     private Double startingPrice;
     
-    @NotNull(message = "Auction duration in hours is required")
-    @Min(value = 1)
     private Integer durationHours;
+    
+    @DecimalMin(value = "0.1", message = "Duration minutes must be positive")
+    private Double durationMinutes;
     
     @NotBlank(message = "Keywords are required")
     private String keywords;
@@ -40,6 +41,9 @@ public class CreateAuctionRequest {
     
     public Integer getDurationHours() { return durationHours; }
     public void setDurationHours(Integer durationHours) { this.durationHours = durationHours; }
+    
+    public Double getDurationMinutes() { return durationMinutes; }
+    public void setDurationMinutes(Double durationMinutes) { this.durationMinutes = durationMinutes; }
     
     public String getKeywords() { return keywords; }
     public void setKeywords(String keywords) { this.keywords = keywords; }
