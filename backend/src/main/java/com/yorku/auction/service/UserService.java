@@ -4,18 +4,27 @@ import com.yorku.auction.dto.LoginRequest;
 import com.yorku.auction.dto.SignupRequest;
 import com.yorku.auction.model.User;
 import com.yorku.auction.repository.UserRepository;
+
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
     
-    private final UserRepository userRepository;
+	private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
     
     // =====================
@@ -31,7 +40,7 @@ public class UserService {
         // Create new user
         User user = new User();
         user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword()); 
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(request.getRole() != null ? request.getRole() : "BUYER");
         user.setUsername(request.getUsername());
         user.setFirst_name(request.getFirst_name());
@@ -50,14 +59,25 @@ public class UserService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Invalid email or password"));
         
-        // Check password (plaintext comparison for Deliverable 2)
-        if (!user.getPassword().equals(request.getPassword())) {
-            throw new RuntimeException("Invalid email or password");
-        }
+//        // Check password (plaintext comparison for Deliverable 2)
+//        if (!user.getPassword().equals(request.getPassword())) {
+//            throw new RuntimeException("Invalid email or password");
+//        }
         
         return user;
     }
     
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        return new org.springframework.security.core.userdetails.User(
+                user.getEmail(),
+                user.getPassword(),
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole()))
+        );
+    }
     // =====================
     // USER CRUD METHODS
     // =====================
@@ -78,6 +98,7 @@ public class UserService {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new RuntimeException("Email already exists");
         }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
     
@@ -87,11 +108,35 @@ public class UserService {
                     if (updatedUser.getEmail() != null) {
                         existingUser.setEmail(updatedUser.getEmail());
                     }
-                    if (updatedUser.getPassword() != null) {
-                        existingUser.setPassword(updatedUser.getPassword());
+                    if (updatedUser.getPassword() != null && !updatedUser.getPassword().isBlank()) {
+                        existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
                     }
                     if (updatedUser.getRole() != null) {
                         existingUser.setRole(updatedUser.getRole());
+                    }
+                    if (updatedUser.getUsername() != null) {
+                        existingUser.setUsername(updatedUser.getUsername());
+                    }
+                    if (updatedUser.getFirst_name() != null) {
+                        existingUser.setFirst_name(updatedUser.getFirst_name());
+                    }
+                    if (updatedUser.getLast_name() != null) {
+                        existingUser.setLast_name(updatedUser.getLast_name());
+                    }
+                    if (updatedUser.getStreet_name() != null) {
+                        existingUser.setStreet_name(updatedUser.getStreet_name());
+                    }
+                    if (updatedUser.getStreet_number() != null) {
+                        existingUser.setStreet_number(updatedUser.getStreet_number());
+                    }
+                    if (updatedUser.getCity() != null) {
+                        existingUser.setCity(updatedUser.getCity());
+                    }
+                    if (updatedUser.getCountry() != null) {
+                        existingUser.setCountry(updatedUser.getCountry());
+                    }
+                    if (updatedUser.getPostal_code() != null) {
+                        existingUser.setPostal_code(updatedUser.getPostal_code());
                     }
                     return userRepository.save(existingUser);
                 })

@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,9 +24,11 @@ import jakarta.validation.Valid;
 public class AuthController {
 
     private final UserService userService;
-
-    public AuthController(UserService userService) {
+    private final AuthenticationManager authenticationManager;
+    
+    public AuthController(UserService userService, AuthenticationManager authenticationManager) {
         this.userService = userService;
+        this.authenticationManager = authenticationManager;
     }
 
     @PostMapping("/signup")
@@ -57,7 +61,16 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         try {
-            User user = userService.login(request);
+        	
+        	authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword()
+                    )
+            );
+        	
+        	User user = userService.getUserByEmail(request.getEmail())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
             String sessionId = UUID.randomUUID().toString();
 
