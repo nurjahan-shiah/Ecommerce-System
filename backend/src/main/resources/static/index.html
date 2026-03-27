@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auction UI - Complete Use Cases</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1240px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 26px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1em;
+        }
+
+        .message {
+            padding: 12px;
+            margin-bottom: 14px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message.info {
+            background: #e9f2ff;
+            color: #0c4a8a;
+            border: 1px solid #cfe2ff;
+        }
+
+        .auth-shell {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+            overflow: hidden;
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .auth-left {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 36px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .auth-left h2 {
+            font-size: 2em;
+            margin-bottom: 12px;
+        }
+
+        .auth-left p {
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+
+        .auth-right {
+            flex: 1;
+            padding: 30px;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #888;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 16px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+            padding: 18px;
+        }
+
+        .span-12 { grid-column: span 12; }
+        .span-8 { grid-column: span 8; }
+        .span-6 { grid-column: span 6; }
+        .span-4 { grid-column: span 4; }
+
+        h3 {
+            color: #667eea;
+            margin-bottom: 12px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 6px;
+            font-size: 1.1em;
+        }
+
+        .uc-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #eef3ff;
+            color: #2f4a93;
+            font-size: 0.8em;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.92em;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 0.95em;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        button {
+            width: 100%;
+            padding: 11px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            color: white;
+            font-weight: 600;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.35);
+        }
+
+        button.secondary {
+            background: #f2f4fb;
+            color: #2b3d7f;
+            border: 1px solid #dce4ff;
+        }
+
+        button.danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .meta {
+            background: #f7f9ff;
+            border: 1px solid #dfe5ff;
+            border-radius: 8px;
+            padding: 10px;
+            color: #334;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .list {
+            max-height: 390px;
+            overflow-y: auto;
+            border: 1px solid #eaf0ff;
+            border-radius: 8px;
+            padding: 8px;
+            background: #fbfdff;
+        }
+
+        .item {
+            background: white;
+            border: 1px solid #e4eaff;
+            border-left: 4px solid #667eea;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 8px;
+        }
+
+        .item-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .item-name {
+            font-weight: 700;
+            color: #24325f;
+        }
+
+        .item-meta {
+            color: #4d5978;
+            font-size: 0.88em;
+            line-height: 1.45;
+            margin-bottom: 8px;
+        }
+
+        .inline-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .inline-actions button {
+            width: auto;
+            padding: 8px 12px;
+            font-size: 0.85em;
+        }
+
+        .small-link {
+            display: inline-block;
+            margin-top: 8px;
+            font-size: 0.86em;
+            color: #667eea;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 980px) {
+            .auth-shell {
+                flex-direction: column;
+            }
+
+            .span-8, .span-6, .span-4, .span-12 {
+                grid-column: span 12;
+            }
+
+            .row, .row-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏛️ Auction System - Full Use Case UI</h1>
+            <p class="subtitle">Sign-Up/Sign-In, Browse, Bid, Pay, Receipt, Seller Upload</p>
+        </header>
+
+        <div id="globalMessage" class="message"></div>
+
+        <section id="authSection" class="auth-shell">
+            <div class="auth-left">
+                <h2>Welcome</h2>
+                <p>Use this screen for both first-time users (Sign-Up) and returning users (Sign-In), then continue through bidding, payment, and receipt flows.</p>
+            </div>
+            <div class="auth-right">
+                <div class="tabs">
+                    <div class="tab active" onclick="switchAuthTab('signin', event)">Sign In</div>
+                    <div class="tab" onclick="switchAuthTab('signup', event)">Sign Up</div>
+                </div>
+
+                <div id="signinTab" class="tab-content active">
+                    <div class="uc-tag">UC1.2 Sign-In</div>
+                    <div class="form-group">
+                        <label for="signinEmail">Email</label>
+                        <input id="signinEmail" type="email" placeholder="bob@example.com" />
+                    </div>
+                    <div class="form-group">
+                        <label for="signinPassword">Password</label>
+                        <input id="signinPassword" type="password" placeholder="password123" />
+                    </div>
+                    <button onclick="signIn()">Sign In</button>
+                    <span class="small-link" onclick="forgotPasswordInfo()">Forgot password?</span>
+                </div>
+
+                <div id="signupTab" class="tab-content">
+                    <div class="uc-tag">UC1.1 Sign-Up</div>
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="suUsername">Username</label>
+                            <input id="suUsername" type="text" placeholder="bob" />
+                        </div>
+                        <div class="form-group">
+                            <label for="suRole">Role</label>
+                            <select id="suRole">
+                                <option value="BUYER">BUYER</option>
+                                <option value="SELLER">SELLER</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="suEmail">Email</label>
+                            <input id="suEmail" type="email" placeholder="bob@example.com" />
+                        </div>
+                        <div class="form-group">
+                            <label for="suPassword">Password</label>
+                            <input id="suPassword" type="password" placeholder="password123" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="suFirstName">First Name</label>
+                            <input id="suFirstName" type="text" placeholder="Bob" />
+                        </div>
+                        <div class="form-group">
+                            <label for="suLastName">Last Name</label>
+                            <input id="suLastName" type="text" placeholder="Smith" />
+                        </div>
+                    </div>
+                    <div class="row-3">
+                        <div class="form-group">
+                            <label for="suStreetNumber">Street #</label>
+                            <input id="suStreetNumber" type="text" placeholder="100" />
+                        </div>
+                        <div class="form-group">
+                            <label for="suStreetName">Street Name</label>
+                            <input id="suStreetName" type="text" placeholder="Main St" />
+                        </div>
+                        <div class="form-group">
+                            <label for="suCity">City</label>
+                            <input id="suCity" type="text" placeholder="Toronto" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="suCountry">Country</label>
+                            <input id="suCountry" type="text" placeholder="Canada" />
+                        </div>
+                        <div class="form-group">
+                            <label for="suPostalCode">Postal Code</label>
+                            <input id="suPostalCode" type="text" placeholder="M1M1M1" />
+                        </div>
+                    </div>
+                    <button onclick="signUp()">Create Account</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="appSection" class="grid hidden">
+            <div class="card span-12">
+                <div class="uc-tag">Session Overview</div>
+                <div id="sessionMeta" class="meta">Not logged in.</div>
+                <div class="inline-actions">
+                    <button class="secondary" onclick="refreshAll()">Refresh All</button>
+                    <button class="danger" onclick="logout()">Logout</button>
+                </div>
+            </div>
+
+            <div class="card span-8">
+                <div class="uc-tag">UC2 Browse Catalogue</div>
+                <h3>Search and Select Auction Item</h3>
+                <div class="row">
+                    <div class="form-group">
+                        <label for="keyword">Keyword</label>
+                        <input id="keyword" placeholder="laptop, tv, phone" />
+                    </div>
+                    <div class="form-group" style="display:flex;align-items:flex-end;gap:8px;">
+                        <button onclick="searchCatalogue()">Search</button>
+                        <button class="secondary" onclick="loadActiveCatalogue()">All Active</button>
+                    </div>
+                </div>
+                <div id="catalogueList" class="list"></div>
+            </div>
+
+            <div class="card span-4">
+                <div class="uc-tag">UC2.3 / UC3</div>
+                <h3>Selected Item & Bid</h3>
+                <div id="selectionMeta" class="meta">No item selected yet.</div>
+                <div class="form-group">
+                    <label for="bidAmount">New Bid Amount</label>
+                    <input id="bidAmount" type="number" step="0.01" min="0.01" placeholder="Enter higher bid" />
+                </div>
+                <button onclick="placeBid()">BID</button>
+                <div id="bidMeta" class="meta" style="margin-top:10px;">No bids submitted in this session.</div>
+            </div>
+
+            <div class="card span-6">
+                <div class="uc-tag">UC4 / UC5 Auction Ended + Payment</div>
+                <h3>Pay Now Flow</h3>
+                <div id="payNowMeta" class="meta">Select an auction first, then wait for it to end. Pay Now will appear inline when eligible.</div>
+                <div id="payAuctionMeta" class="meta">Current session auction: none selected.</div>
+                <div id="addressMeta" class="meta">Address from sign-up: N/A</div>
+                <div id="payNowActionMeta" class="meta">No pay action available yet.</div>
+                <div class="inline-actions" style="margin-bottom:10px;">
+                    <button id="payNowInlineBtn" class="secondary hidden" onclick="handlePayNowInline()">Pay Now</button>
+                </div>
+                <div class="row">
+                    <div class="form-group">
+                        <label for="expedited">Shipping</label>
+                        <select id="expedited">
+                            <option value="false">Standard</option>
+                            <option value="true">Expedited</option>
+                        </select>
+                    </div>
+                    <div class="form-group"></div>
+                </div>
+                <div id="paymentFormWrap" class="hidden">
+                <div class="row-3">
+                    <div class="form-group">
+                        <label for="cardNumber">Card Number</label>
+                        <input id="cardNumber" placeholder="4111111111111111" />
+                    </div>
+                    <div class="form-group">
+                        <label for="cardName">Name on Card</label>
+                        <input id="cardName" placeholder="John Doe" />
+                    </div>
+                    <div class="form-group">
+                        <label for="expiryDate">Expiry</label>
+                        <input id="expiryDate" placeholder="12/27" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group">
+                        <label for="securityCode">Security Code</label>
+                        <input id="securityCode" placeholder="123" />
+                    </div>
+                    <div class="form-group" style="display:flex;align-items:flex-end;">
+                        <button onclick="submitPayment()">Submit Payment</button>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <div class="card span-6">
+                <div class="uc-tag">UC6 Receipt + Shipment Details</div>
+                <h3>Receipt</h3>
+                <div id="receiptMeta" class="meta">Receipt will be displayed after successful payment.</div>
+            </div>
+
+            <div id="sellerPanel" class="card span-12 hidden">
+                <div class="uc-tag">UC7 Seller Auction Item Upload</div>
+                <h3>Create Auction Item (Forward Auction)</h3>
+                <div class="row-3">
+                    <div class="form-group">
+                        <label for="itemName">Item Name</label>
+                        <input id="itemName" placeholder="Brand New Samsung TV" />
+                    </div>
+                    <div class="form-group">
+                        <label for="startingPrice">Starting Bid Price</label>
+                        <input id="startingPrice" type="number" step="0.01" min="0.01" placeholder="500" />
+                    </div>
+                    <div class="form-group">
+                        <label for="durationMinutes">Auction Duration (Minutes)</label>
+                        <input id="durationMinutes" type="number" step="0.1" min="0.1" placeholder="3.5" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" placeholder="Detailed item description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="keywords">Keywords</label>
+                        <input id="keywords" placeholder="tv,samsung,4k" />
+                    </div>
+                </div>
+                <div class="row-3">
+                    <div class="form-group">
+                        <label for="shippingPrice">Shipping Price</label>
+                        <input id="shippingPrice" type="number" step="0.01" min="0" placeholder="20" />
+                    </div>
+                    <div class="form-group">
+                        <label for="expeditedPrice">Expedited Shipping Price</label>
+                        <input id="expeditedPrice" type="number" step="0.01" min="0" placeholder="10" />
+                    </div>
+                    <div class="form-group">
+                        <label for="shippingDays">Shipping Days</label>
+                        <input id="shippingDays" type="number" min="1" placeholder="5" />
+                    </div>
+                </div>
+                <button onclick="uploadAuctionItem()">Upload Auction Item</button>
+                <div id="sellerMeta" class="meta" style="margin-top:10px;">No seller upload yet.</div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080/api';
+        const STORAGE_KEY = 'auction_ui_user';
+        let currentSelectionState = null;
+        let liveSyncPoller = null;
+        let liveSyncInFlight = false;
+        let countdownTimer = null;
+
+        function showMessage(type, text) {
+            const msg = document.getElementById('globalMessage');
+            msg.className = `message ${type} show`;
+            msg.textContent = text;
+        }
+
+        function clearMessage() {
+            const msg = document.getElementById('globalMessage');
+            msg.className = 'message';
+            msg.textContent = '';
+        }
+
+        function switchAuthTab(tab, event) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('signinTab').classList.toggle('active', tab === 'signin');
+            document.getElementById('signupTab').classList.toggle('active', tab === 'signup');
+        }
+
+        function forgotPasswordInfo() {
+            showMessage('info', 'Forgot password UI is shown, but password reset API is not implemented in backend yet.');
+        }
+
+        function getCurrentUser() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return null;
+            try {
+                return JSON.parse(raw);
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function setCurrentUser(user) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+        }
+
+        function clearCurrentUser() {
+            localStorage.removeItem(STORAGE_KEY);
+        }
+
+        function setPayNowInlineState({ message, showButton, buttonClass = 'secondary' }) {
+            const msg = document.getElementById('payNowActionMeta');
+            const btn = document.getElementById('payNowInlineBtn');
+            msg.textContent = message;
+            btn.className = `hidden`;
+            if (showButton) {
+                btn.className = buttonClass;
+            }
+        }
+
+        function getHeaders(includeSession = false, includeUser = false) {
+            const user = getCurrentUser();
+            const headers = { 'Content-Type': 'application/json' };
+            if (includeSession && user?.sessionId) headers['X-Session-Id'] = user.sessionId;
+            if (includeUser && user?.userId) headers['X-User-Id'] = user.userId;
+            return headers;
+        }
+
+        function toMoney(v) {
+            const n = Number(v || 0);
+            return Number.isFinite(n) ? n.toFixed(2) : String(v);
+        }
+
+        function parseEndEpoch(endTime) {
+            if (!endTime) return null;
+            const parsed = Date.parse(String(endTime).replace(' ', 'T') + 'Z');
+            if (Number.isNaN(parsed)) return null;
+            return Math.floor(parsed / 1000);
+        }
+
+        function formatRemaining(totalSec) {
+            const sec = Math.max(0, Number(totalSec) || 0);
+            const h = Math.floor(sec / 3600);
+            const m = Math.floor((sec % 3600) / 60);
+            const s = sec % 60;
+            const hh = String(h).padStart(2, '0');
+            const mm = String(m).padStart(2, '0');
+            const ss = String(s).padStart(2, '0');
+            return `${hh}:${mm}:${ss}`;
+        }
+
+        function updateCountdowns() {
+            const now = Math.floor(Date.now() / 1000);
+            document.querySelectorAll('[data-countdown-end-epoch]').forEach(el => {
+                const endEpoch = Number(el.getAttribute('data-countdown-end-epoch'));
+                const rem = Number.isFinite(endEpoch) ? Math.max(0, endEpoch - now) : 0;
+                el.textContent = formatRemaining(rem);
+            });
+        }
+
+        function ensureCountdownTimer() {
+            if (countdownTimer) return;
+            countdownTimer = setInterval(updateCountdowns, 1000);
+            updateCountdowns();
+        }
+
+        async function parseResponse(response) {
+            let body = {};
+            try { body = await response.json(); } catch (_) {}
+            if (!response.ok) {
+                throw new Error(body.error || `HTTP ${response.status}`);
+            }
+            return body;
+        }
+
+        function isSelectionEnded(sel) {
+            const status = (sel?.status || '').toUpperCase();
+            if (status === 'ENDED' || status === 'COMPLETED') return true;
+            if (!sel?.end_time) return false;
+            const endEpoch = parseEndEpoch(sel.end_time);
+            if (!endEpoch) return false;
+            return Math.floor(Date.now() / 1000) >= endEpoch;
+        }
+
+        async function signUp() {
+            clearMessage();
+            const payload = {
+                username: document.getElementById('suUsername').value.trim(),
+                password: document.getElementById('suPassword').value.trim(),
+                role: document.getElementById('suRole').value,
+                email: document.getElementById('suEmail').value.trim(),
+                first_name: document.getElementById('suFirstName').value.trim(),
+                last_name: document.getElementById('suLastName').value.trim(),
+                street_number: document.getElementById('suStreetNumber').value.trim(),
+                street_name: document.getElementById('suStreetName').value.trim(),
+                city: document.getElementById('suCity').value.trim(),
+                country: document.getElementById('suCountry').value.trim(),
+                postal_code: document.getElementById('suPostalCode').value.trim()
+            };
+
+            if (!payload.username || !payload.password || !payload.email || !payload.first_name || !payload.last_name || !payload.street_name || !payload.street_number || !payload.city || !payload.country || !payload.postal_code) {
+                showMessage('error', 'Fill all sign-up fields before creating account.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/signup`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                await parseResponse(response);
+                showMessage('success', 'Sign-up successful. Signing you in automatically...');
+
+                document.getElementById('signinEmail').value = payload.email;
+                document.getElementById('signinPassword').value = payload.password;
+                await signIn();
+            } catch (err) {
+                showMessage('error', err.message);
+            }
+        }
+
+        async function signIn() {
+            clearMessage();
+            const email = document.getElementById('signinEmail').value.trim();
+            const password = document.getElementById('signinPassword').value.trim();
+
+            if (!email || !password) {
+                showMessage('error', 'Email and password are required for sign-in.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const user = await parseResponse(response);
+                setCurrentUser(user);
+                showMessage('success', `Signed in as ${user.email} (${user.role}).`);
+                showApp();
+                await refreshAll();
+                startLiveSync();
+            } catch (err) {
+                showMessage('error', err.message || 'Invalid username or password');
+            }
+        }
+
+        function showApp() {
+            document.getElementById('authSection').classList.add('hidden');
+            document.getElementById('appSection').classList.remove('hidden');
+            updateSessionMeta();
+        }
+
+        function showAuth() {
+            document.getElementById('appSection').classList.add('hidden');
+            document.getElementById('authSection').classList.remove('hidden');
+        }
+
+        function updateSessionMeta() {
+            const user = getCurrentUser();
+            const meta = document.getElementById('sessionMeta');
+            if (!user) {
+                meta.textContent = 'Not logged in.';
+                return;
+            }
+            meta.textContent = `Logged in as ${user.email} (${user.role}) | userId=${user.userId} | sessionId=${user.sessionId}`;
+            document.getElementById('sellerPanel').classList.toggle('hidden', (user.role || '').toUpperCase() !== 'SELLER');
+            const address = [user.street_number, user.street_name, user.city, user.country, user.postal_code]
+                .filter(Boolean)
+                .join(', ');
+            document.getElementById('addressMeta').textContent = `Address from sign-up: ${address || 'N/A'}`;
+        }
+
+        function logout() {
+            clearCurrentUser();
+            currentSelectionState = null;
+            stopLiveSync();
+            showAuth();
+            showMessage('info', 'Logged out.');
+        }
+
+        async function loadActiveCatalogue() {
+            const response = await fetch(`${API_BASE}/catalogue/items/active`);
+            const items = await parseResponse(response);
+            renderCatalogue(items || []);
+        }
+
+        async function searchCatalogue() {
+            const keyword = document.getElementById('keyword').value.trim();
+            const response = await fetch(`${API_BASE}/catalogue/items?keyword=${encodeURIComponent(keyword)}`);
+            const items = await parseResponse(response);
+            renderCatalogue(items || []);
+            showMessage('success', keyword ? `Search complete for "${keyword}".` : 'Loaded active catalogue.');
+        }
+
+        function renderCatalogue(items) {
+            const wrap = document.getElementById('catalogueList');
+            if (!items.length) {
+                wrap.innerHTML = '<div class="item"><div class="item-meta">No matching active auction items found.</div></div>';
+                return;
+            }
+
+            wrap.innerHTML = items.map(item => `
+                <div class="item">
+                    <div class="item-top">
+                        <div class="item-name">${item.itemName} (Auction #${item.auctionId})</div>
+                        <input type="radio" name="selectedAuction" onchange="setSelection(${item.auctionId})" />
+                    </div>
+                    <div class="item-meta">
+                        Current Bid: $${toMoney(item.currentPrice)} | Type: ${item.auctionType} | Remaining:
+                        <span data-countdown-end-epoch="${parseEndEpoch(item.endTime) || ''}">${formatRemaining(item.remainingSeconds || 0)}</span><br/>
+                        Shipping: $${toMoney(item.shippingPrice)} (expedited +$${toMoney(item.expeditedShippingPrice)})
+                    </div>
+                    <div class="inline-actions">
+                        <button class="secondary" onclick="setSelection(${item.auctionId})">Select Item</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function setSelection(auctionId) {
+            const user = getCurrentUser();
+            if (!user) {
+                showMessage('error', 'Please sign in first.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/session/selection`, {
+                    method: 'POST',
+                    headers: getHeaders(true, true),
+                    body: JSON.stringify({ auctionId })
+                });
+                const data = await parseResponse(response);
+                document.getElementById('selectionMeta').textContent = `Selected auction: ${data.selectedAuctionId}`;
+                showMessage('success', `Selected auction ${data.selectedAuctionId} for this session.`);
+                await getSelection();
+            } catch (err) {
+                showMessage('error', err.message);
+            }
+        }
+
+        async function getSelection() {
+            const user = getCurrentUser();
+            if (!user) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/session/selection`, { headers: getHeaders(true, false) });
+                const data = await parseResponse(response);
+
+                if (!data || !data.auction_id) {
+                    currentSelectionState = null;
+                    document.getElementById('selectionMeta').textContent = 'No item selected for this session.';
+                    document.getElementById('payNowMeta').textContent = 'No selection available to validate payment state.';
+                    document.getElementById('payAuctionMeta').textContent = 'Current session auction: none selected.';
+                    setPayNowInlineState({
+                        message: 'No pay action available yet.',
+                        showButton: false
+                    });
+                    document.getElementById('paymentFormWrap').classList.add('hidden');
+                    return;
+                }
+
+                currentSelectionState = data;
+                const selEndEpoch = parseEndEpoch(data.end_time);
+                document.getElementById('selectionMeta').innerHTML =
+                    `Auction #${data.auction_id} | Item: ${data.item_name} | Current: $${toMoney(data.current_price)} | ` +
+                    `Status: ${data.status} | Highest Bidder: ${data.highest_bidder_id ?? 'N/A'} | Remaining: ` +
+                    `<span data-countdown-end-epoch="${selEndEpoch || ''}">${formatRemaining((selEndEpoch || 0) - Math.floor(Date.now() / 1000))}</span>s`;
+                document.getElementById('payAuctionMeta').textContent = `Current session auction: #${data.auction_id} (${data.item_name})`;
+                const ended = isSelectionEnded(data);
+                if (ended && (data.status || '').toUpperCase() !== 'COMPLETED') {
+                    document.getElementById('payNowMeta').textContent = 'Auction has ended. Use Pay Now below.';
+                    setPayNowInlineState({
+                        message: 'Auction ended. Click Pay Now. If you are not the winner, a failure message will be shown.',
+                        showButton: true,
+                        buttonClass: 'secondary'
+                    });
+                } else if ((data.status || '').toUpperCase() === 'COMPLETED') {
+                    document.getElementById('payNowMeta').textContent = 'Auction already completed and paid.';
+                    setPayNowInlineState({
+                        message: 'Payment already completed for this auction.',
+                        showButton: false
+                    });
+                    document.getElementById('paymentFormWrap').classList.add('hidden');
+                } else {
+                    document.getElementById('payNowMeta').textContent = 'Waiting for auction to end.';
+                    setPayNowInlineState({
+                        message: 'Pay Now will appear when the selected auction ends.',
+                        showButton: false
+                    });
+                    document.getElementById('paymentFormWrap').classList.add('hidden');
+                }
+            } catch (err) {
+                showMessage('error', err.message);
+            }
+        }
+
+        async function clearSelection() {
+            const user = getCurrentUser();
+            if (!user) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/session/selection`, {
+                    method: 'DELETE',
+                    headers: getHeaders(true, false)
+                });
+                if (response.status !== 204) {
+                    await parseResponse(response);
+                }
+                currentSelectionState = null;
+                document.getElementById('selectionMeta').textContent = 'Selection cleared.';
+                document.getElementById('payNowMeta').textContent = 'No active selection for pay-now flow.';
+                document.getElementById('payAuctionMeta').textContent = 'Current session auction: none selected.';
+                setPayNowInlineState({
+                    message: 'No pay action available yet.',
+                    showButton: false
+                });
+                document.getElementById('paymentFormWrap').classList.add('hidden');
+                showMessage('success', 'Selection cleared for this session.');
+            } catch (err) {
+                showMessage('error', err.message);
+            }
+        }
+
+        async function placeBid() {
+            const user = getCurrentUser();
+            if (!user) {
+                showMessage('error', 'Sign in first.');
+                return;
+            }
+
+            const bidAmount = Number(document.getElementById('bidAmount').value);
+            if (!bidAmount || bidAmount <= 0) {
+                showMessage('error', 'Bid amount must be positive.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/bids`, {
+                    method: 'POST',
+                    headers: getHeaders(true, true),
+                    body: JSON.stringify({ bidAmount })
+                });
+                const data = await parseResponse(response);
+                document.getElementById('bidMeta').textContent = `Bid accepted. Auction #${data.auctionId}, old=$${toMoney(data.oldPrice)}, new=$${toMoney(data.newPrice)}.`;
+                showMessage('success', 'Bid placed successfully.');
+                await getSelection();
+                await loadActiveCatalogue();
+            } catch (err) {
+                showMessage('error', err.message);
+            }
+        }
+
+        async function submitPayment() {
+            const user = getCurrentUser();
+            if (!user) {
+                showMessage('error', 'Sign in first.');
+                return;
+            }
+
+            const payload = {
+                auctionId: Number(currentSelectionState?.auction_id),
+                expeditedShipping: document.getElementById('expedited').value === 'true',
+                cardNumber: document.getElementById('cardNumber').value.trim(),
+                cardName: document.getElementById('cardName').value.trim(),
+                expiryDate: document.getElementById('expiryDate').value.trim(),
+                securityCode: document.getElementById('securityCode').value.trim()
+            };
+
+            if (!payload.auctionId || !payload.cardNumber || !payload.cardName || !payload.expiryDate || !payload.securityCode) {
+                showMessage('error', 'All payment fields are required.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/payments/pay`, {
+                    method: 'POST',
+                    headers: getHeaders(true, true),
+                    body: JSON.stringify(payload)
+                });
+                const data = await parseResponse(response);
+
+                document.getElementById('receiptMeta').textContent =
+                    `Receipt: total paid $${toMoney(data.totalAmount)} | item ${data.itemName} | winner userId=${data.winnerId} | shipment: The item will be shipped in ${data.shippingDays} days | address: ${data.recipientName}, ${data.shippingAddress}`;
+
+                showMessage('success', 'Payment completed. Receipt and shipment details generated.');
+                await getSelection();
+            } catch (err) {
+                showMessage('error', err.message);
+            }
+        }
+
+        function handlePayNowInline() {
+            const user = getCurrentUser();
+            const s = (currentSelectionState?.status || '').toUpperCase();
+            const highest = Number(currentSelectionState?.highest_bidder_id);
+            const isWinner = highest === Number(user?.userId);
+            const ended = isSelectionEnded(currentSelectionState);
+
+            if (!ended || s === 'COMPLETED') {
+                setPayNowInlineState({
+                    message: 'Payment is not available for this auction.',
+                    showButton: false
+                });
+                return;
+            }
+
+            if (!isWinner) {
+                setPayNowInlineState({
+                    message: 'Failure: You are not the winning bidder for this auction.',
+                    showButton: true,
+                    buttonClass: 'secondary'
+                });
+                return;
+            }
+
+            document.getElementById('paymentFormWrap').classList.remove('hidden');
+            document.getElementById('paymentFormWrap').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setPayNowInlineState({
+                message: 'You are the winner. Enter payment details below and submit.',
+                showButton: true,
+                buttonClass: 'secondary'
+            });
+            showMessage('info', 'Pay Now opened. Enter payment details and submit.');
+        }
+
+        async function uploadAuctionItem() {
+            const user = getCurrentUser();
+            if (!user) {
+                showMessage('error', 'Sign in first.');
+                return;
+            }
+
+            const payload = {
+                itemName: document.getElementById('itemName').value.trim(),
+                description: document.getElementById('description').value.trim(),
+                startingPrice: Number(document.getElementById('startingPrice').value),
+                durationMinutes: Number(document.getElementById('durationMinutes').value),
+                keywords: document.getElementById('keywords').value.trim(),
+                shippingPrice: Number(document.getElementById('shippingPrice').value || 0),
+                expeditedShippingPrice: Number(document.getElementById('expeditedPrice').value || 0),
+                shippingDays: Number(document.getElementById('shippingDays').value || 7)
+            };
+
+            if (!payload.itemName || !payload.description || !payload.keywords || payload.startingPrice <= 0 || payload.durationMinutes <= 0) {
+                showMessage('error', 'Provide valid required seller fields (item, description, keywords, positive starting price, positive duration in minutes).');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/seller/auctions`, {
+                    method: 'POST',
+                    headers: getHeaders(false, true),
+                    body: JSON.stringify(payload)
+                });
+                const data = await parseResponse(response);
+                document.getElementById('sellerMeta').textContent = `Item uploaded. Auction #${data.auctionId}, Item #${data.itemId}, starting price $${toMoney(data.startingPrice)}.`;
+                showMessage('success', 'Seller upload successful. Item is now in catalogue.');
+                await loadActiveCatalogue();
+            } catch (err) {
+                showMessage('error', err.message);
+            }
+        }
+
+        async function syncLiveData(silent = true) {
+            if (liveSyncInFlight) return;
+            liveSyncInFlight = true;
+            try {
+                updateSessionMeta();
+                await Promise.allSettled([loadActiveCatalogue(), getSelection()]);
+                if (!silent) showMessage('info', 'Data refreshed.');
+            } catch (err) {
+                if (!silent) showMessage('error', err.message);
+            } finally {
+                liveSyncInFlight = false;
+            }
+        }
+
+        async function refreshAll() {
+            await syncLiveData(false);
+        }
+
+        function startLiveSync() {
+            if (liveSyncPoller) return;
+            // keep sessions in different browsers roughly in sync for bids/selection updates
+            liveSyncPoller = setInterval(() => {
+                syncLiveData(true);
+            }, 3000);
+        }
+
+        function stopLiveSync() {
+            if (!liveSyncPoller) return;
+            clearInterval(liveSyncPoller);
+            liveSyncPoller = null;
+        }
+
+        window.addEventListener('load', async () => {
+            const user = getCurrentUser();
+            ensureCountdownTimer();
+            if (user?.sessionId && user?.userId) {
+                showApp();
+                await refreshAll();
+                startLiveSync();
+            } else {
+                showAuth();
+                showMessage('info', 'Sign in or sign up to start the full UC flow.');
+            }
+        });
+    </script>
+</body>
+</html>
