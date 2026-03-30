@@ -1,0 +1,25 @@
+# Git
+.git
+.gitignore
+
+# Maven build output (rebuilt inside Docker)
+backend/target/
+
+# Local database files
+backend/auction.db
+database/
+
+# IDE files
+.idea/
+*.iml
+*.classpath
+*.project
+.settings/
+
+# Docs and frontend (served from Spring Boot static resources)
+docs/
+frontend/
+
+# OS
+.DS_Store
+Thumbs.db

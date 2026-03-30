@@ -5,6 +5,31 @@ A full-stack forward auction system. Sellers list items with a starting price an
 
 ---
 
+## Quick Start with Docker (Deliverable 3)
+
+The entire application runs in a single Docker container — no local Java or SQLite install needed.
+
+**Prerequisites:** Docker Desktop (https://www.docker.com/products/docker-desktop/)
+
+```bash
+# 1. Build and start
+docker compose up --build
+
+# 2. Open the app
+#    http://localhost:8080
+
+# 3. Stop
+docker compose down
+
+# 4. Full reset (wipes the database volume)
+docker compose down -v
+docker compose up --build
+```
+
+The database is automatically created and seeded with sample data on first boot.
+
+---
+
 ## Tech Stack
 
 | Layer | Technology |
