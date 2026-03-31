@@ -274,6 +274,44 @@ a{color:inherit;text-decoration:none;}
 #aiSend{width:34px;height:34px;border-radius:50%;background:var(--navy);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;transition:background .15s;font-size:.85rem;}
 #aiSend:hover{background:var(--navy2);}
 
+/* ─── NOTIFICATION BELL ─── */
+#notifBell{position:fixed;bottom:96px;right:28px;z-index:599;width:46px;height:46px;border-radius:50%;background:var(--surface);border:1.5px solid var(--border);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:var(--shadow);transition:transform .2s,box-shadow .2s;}
+#notifBell:hover{transform:scale(1.08);box-shadow:var(--shadow-lg);}
+#notifBadge{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;border-radius:999px;background:var(--accent);color:#fff;font-size:.65rem;font-weight:800;display:none;align-items:center;justify-content:center;padding:0 4px;border:2px solid var(--surface);}
+#notifBadge.show{display:flex;}
+@keyframes bellShake{0%,100%{transform:rotate(0);}20%{transform:rotate(-18deg);}40%{transform:rotate(16deg);}60%{transform:rotate(-10deg);}80%{transform:rotate(8deg);}}
+#notifBell.ring{animation:bellShake .5s ease;}
+#notifPanel{position:fixed;bottom:154px;right:28px;z-index:599;width:360px;max-height:480px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--shadow-lg);display:none;flex-direction:column;overflow:hidden;animation:panelIn .2s ease;}
+#notifPanel.open{display:flex;}
+.notif-head{background:var(--navy);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;}
+.notif-head-title{color:#fff;font-weight:800;font-size:.88rem;display:flex;align-items:center;gap:8px;}
+.notif-head-actions{display:flex;align-items:center;gap:6px;}
+.notif-clear{background:none;border:none;color:rgba(255,255,255,.55);font-size:.72rem;cursor:pointer;font-family:var(--font-display);padding:3px 7px;border-radius:4px;transition:color .15s;}
+.notif-clear:hover{color:#fff;}
+.notif-close{background:none;border:none;color:rgba(255,255,255,.6);cursor:pointer;font-size:1rem;padding:4px;line-height:1;transition:color .15s;}
+.notif-close:hover{color:#fff;}
+#notifList{flex:1;overflow-y:auto;padding:8px 0;}
+#notifList::-webkit-scrollbar{width:3px;}
+#notifList::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+.notif-empty{text-align:center;padding:36px 16px;color:var(--muted);font-size:.84rem;}
+.notif-item{display:flex;gap:12px;padding:11px 16px;border-bottom:1px solid var(--border);cursor:default;transition:background .15s;animation:notifSlideIn .25s ease;}
+.notif-item:last-child{border-bottom:none;}
+.notif-item:hover{background:var(--surface2);}
+.notif-item.unread{background:var(--accent-light);}
+.notif-item.unread:hover{background:#fce5db;}
+@keyframes notifSlideIn{from{opacity:0;transform:translateX(12px);}to{opacity:1;transform:translateX(0);}}
+.notif-icon{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1rem;}
+.notif-icon.bid{background:#e8f5ee;color:var(--green);}
+.notif-icon.ended{background:var(--gold-light);color:var(--gold);}
+.notif-icon.created{background:#e9f2ff;color:#3b82f6;}
+.notif-icon.payment{background:var(--green-light);color:var(--green);}
+.notif-body{flex:1;min-width:0;}
+.notif-title{font-weight:700;font-size:.82rem;color:var(--text);margin-bottom:2px;}
+.notif-msg{font-size:.78rem;color:var(--text2);line-height:1.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.notif-time{font-size:.7rem;color:var(--muted);margin-top:3px;}
+.notif-sse-dot{width:7px;height:7px;border-radius:50%;background:#6b7280;display:inline-block;margin-right:6px;transition:background .4s;}
+.notif-sse-dot.live{background:#4ade80;animation:dotBlink 1.8s ease-in-out infinite;}
+
 /* ─── MISC ─── */
 .empty-state{text-align:center;padding:48px 20px;color:var(--muted);}
 .empty-state .icon{font-size:2.8rem;margin-bottom:12px;display:block;}
@@ -323,6 +361,9 @@ a{color:inherit;text-decoration:none;}
       <span style="color:rgba(255,255,255,.4);margin:0 4px;">·</span>
       <span id="userRole" style="color:var(--gold);font-weight:700;font-size:.75rem;"></span>
       <button class="tb-btn" style="margin-left:8px;padding:4px 10px;font-size:.75rem;" onclick="logout()">Sign Out</button>
+      <span title="Live notifications" style="display:flex;align-items:center;gap:4px;font-size:.7rem;color:rgba(255,255,255,.5);margin-left:4px;">
+        <span class="notif-sse-dot" id="sseDot"></span><span id="sseLabel">offline</span>
+      </span>
     </div>
   </div>
 </div>
@@ -462,7 +503,6 @@ a{color:inherit;text-decoration:none;}
         </select>
       </div>
       <div id="itemsContainer" class="items-grid">
-        <!-- shimmer placeholders -->
         <div class="loading-shimmer"></div>
         <div class="loading-shimmer"></div>
         <div class="loading-shimmer"></div>
@@ -472,8 +512,6 @@ a{color:inherit;text-decoration:none;}
 
     <!-- RIGHT PANEL -->
     <aside class="right-panel">
-
-      <!-- Selected Item -->
       <div class="panel-card" id="selPanel">
         <div class="panel-header">
           <div class="panel-title">📦 Selected Item <span class="panel-badge">UC3</span></div>
@@ -485,16 +523,12 @@ a{color:inherit;text-decoration:none;}
           </div>
         </div>
       </div>
-
-      <!-- Payment -->
       <div class="panel-card" id="payPanel" style="display:none">
         <div class="pay-header">
           <div class="pay-title">💳 Payment <span class="panel-badge" style="background:rgba(255,255,255,.2);color:#fff;">UC4 · UC5</span></div>
         </div>
-        <div class="panel-body" id="payBody">
-        </div>
+        <div class="panel-body" id="payBody"></div>
       </div>
-
     </aside>
   </div>
 
@@ -531,6 +565,29 @@ a{color:inherit;text-decoration:none;}
 <!-- TOAST -->
 <div id="toast"></div>
 
+<!-- NOTIFICATION BELL -->
+<button id="notifBell" onclick="toggleNotifPanel()" title="Notifications" style="display:none">
+  🔔
+  <span id="notifBadge">0</span>
+</button>
+
+<!-- NOTIFICATION PANEL -->
+<div id="notifPanel">
+  <div class="notif-head">
+    <div class="notif-head-title">
+      🔔 Live Notifications
+      <span class="notif-sse-dot live" id="notifSseDot"></span>
+    </div>
+    <div class="notif-head-actions">
+      <button class="notif-clear" onclick="clearNotifications()">Clear all</button>
+      <button class="notif-close" onclick="toggleNotifPanel()">✕</button>
+    </div>
+  </div>
+  <div id="notifList">
+    <div class="notif-empty" id="notifEmpty">No notifications yet.<br>You'll be notified of bids, auction endings, and new listings.</div>
+  </div>
+</div>
+
 <!-- AI TOGGLE BUTTON -->
 <button id="aiToggle" onclick="toggleAI()" title="Ask Atlas AI">
   <div class="ai-ring"></div>
@@ -564,7 +621,6 @@ a{color:inherit;text-decoration:none;}
 </div>
 
 <script>
-// ─── STATE ────────────────────────────────────────────────────────────────────
 const API = '/api';
 const SK  = 'atlas_session_v2';
 let currentUser = null;
@@ -574,8 +630,11 @@ let viewMode    = 'grid';
 let syncTimer   = null;
 let cdTimer     = null;
 let aiOpen      = false;
+let sseConn     = null;
+let notifOpen   = false;
+let unreadCount = 0;
+let notifications = [];
 
-// ─── UTILS ────────────────────────────────────────────────────────────────────
 function $id(id){ return document.getElementById(id); }
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function money(v){ return Number(v||0).toFixed(2); }
@@ -616,7 +675,6 @@ function itemEmoji(name){
   return '📦';
 }
 
-// ─── AUTH API ─────────────────────────────────────────────────────────────────
 function getUser(){ return currentUser; }
 function setUser(u){ currentUser = u; localStorage.setItem(SK, JSON.stringify(u)); }
 function clearUser(){ currentUser = null; localStorage.removeItem(SK); }
@@ -636,7 +694,6 @@ async function api(method, path, body=null, sess=false, usr=false){
   return d;
 }
 
-// ─── TOAST ────────────────────────────────────────────────────────────────────
 function toast(type, msg, dur=4000){
   const icons = {success:'✓', error:'✕', info:'ℹ'};
   const c = $id('toast'), el = document.createElement('div');
@@ -646,11 +703,7 @@ function toast(type, msg, dur=4000){
   setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateX(20px)'; el.style.transition='all .3s'; setTimeout(()=>el.remove(),300); }, dur);
 }
 
-// ─── AUTH UI ──────────────────────────────────────────────────────────────────
-function openAuth(tab){
-  $id('authOverlay').style.display = 'flex';
-  switchAuthTab(tab);
-}
+function openAuth(tab){ $id('authOverlay').style.display = 'flex'; switchAuthTab(tab); }
 function closeAuth(){ $id('authOverlay').style.display = 'none'; }
 $id('authOverlay').addEventListener('click', e => { if(e.target === $id('authOverlay')) closeAuth(); });
 
@@ -674,33 +727,24 @@ async function signIn(){
 
 async function signUp(){
   const p = {
-    username: $id('suUser').value.trim(),
-    password: $id('suPass').value.trim(),
-    role:     $id('suRole').value,
-    email:    $id('suEmail').value.trim(),
-    first_name: $id('suFirst').value.trim(),
-    last_name:  $id('suLast').value.trim(),
-    street_number: $id('suStreetNum').value.trim(),
-    street_name:   $id('suStreetName').value.trim(),
-    city:          $id('suCity').value.trim(),
-    country:       $id('suCountry').value.trim(),
-    postal_code:   $id('suPostal').value.trim(),
+    username: $id('suUser').value.trim(), password: $id('suPass').value.trim(),
+    role: $id('suRole').value, email: $id('suEmail').value.trim(),
+    first_name: $id('suFirst').value.trim(), last_name: $id('suLast').value.trim(),
+    street_number: $id('suStreetNum').value.trim(), street_name: $id('suStreetName').value.trim(),
+    city: $id('suCity').value.trim(), country: $id('suCountry').value.trim(),
+    postal_code: $id('suPostal').value.trim(),
   };
-  const missing = Object.values(p).some(v=>!v);
-  if(missing){ toast('error','Please fill in all fields'); return; }
+  if(Object.values(p).some(v=>!v)){ toast('error','Please fill in all fields'); return; }
   try{
     await api('POST','/auth/signup',p);
     toast('success','Account created! Signing you in…');
-    $id('siEmail').value = p.email;
-    $id('siPass').value  = p.password;
-    switchAuthTab('signin');
-    await signIn();
+    $id('siEmail').value = p.email; $id('siPass').value = p.password;
+    switchAuthTab('signin'); await signIn();
   }catch(e){ toast('error', e.message); }
 }
 
 function logout(){
-  clearUser(); currentSel=null; stopSync();
-  showLoggedOut();
+  clearUser(); currentSel=null; stopSync(); sseDisconnect(); showLoggedOut();
   $id('sellerPanel').style.display = 'none';
   $id('payPanel').style.display    = 'none';
   $id('selBody').innerHTML = `<div class="sel-empty"><span class="icon">👆</span><p>Sign in to start bidding</p></div>`;
@@ -708,15 +752,15 @@ function logout(){
 }
 
 function showLoggedIn(u){
-  $id('signInBtn').style.display  = 'none';
-  $id('signUpBtn').style.display  = 'none';
-  $id('userChip').style.display   = 'flex';
-  $id('userEmail').textContent     = u.email || u.username;
-  $id('userRole').textContent      = u.role || '';
-  $id('userAvatar').textContent    = (u.email||u.username||'U')[0].toUpperCase();
-  if((u.role||'').toUpperCase() === 'SELLER'){
-    $id('sellerPanel').style.display = 'block';
-  }
+  $id('signInBtn').style.display = 'none';
+  $id('signUpBtn').style.display = 'none';
+  $id('userChip').style.display  = 'flex';
+  $id('userEmail').textContent    = u.email || u.username;
+  $id('userRole').textContent     = u.role || '';
+  $id('userAvatar').textContent   = (u.email||u.username||'U')[0].toUpperCase();
+  if((u.role||'').toUpperCase() === 'SELLER') $id('sellerPanel').style.display = 'block';
+  $id('notifBell').style.display = 'flex';
+  sseConnect(u.userId || u.id);
 }
 function showLoggedOut(){
   $id('signInBtn').style.display = '';
@@ -724,7 +768,6 @@ function showLoggedOut(){
   $id('userChip').style.display  = 'none';
 }
 
-// ─── CATALOGUE ────────────────────────────────────────────────────────────────
 async function loadCatalogue(keyword=''){
   try{
     const path = keyword ? `/catalogue/items?keyword=${encodeURIComponent(keyword)}` : '/catalogue/items/active';
@@ -757,7 +800,6 @@ function applyFilters(){
   const maxP = parseFloat($id('fMaxPrice').value) || Infinity;
   const timeFilter = document.querySelector('input[name=fTime]:checked')?.value || '';
   const sort = $id('sortSelect').value;
-
   items = items.filter(i => {
     const ended = isEnded(i);
     if(!showActive && !ended) return false;
@@ -770,21 +812,17 @@ function applyFilters(){
     }
     return true;
   });
-
   if(sort==='price-asc')  items.sort((a,b)=>a.currentPrice-b.currentPrice);
   if(sort==='price-desc') items.sort((a,b)=>b.currentPrice-a.currentPrice);
   if(sort==='time-asc')   items.sort((a,b)=>remSec(parseEpoch(a.endTime))-remSec(parseEpoch(b.endTime)));
   if(sort==='time-desc')  items.sort((a,b)=>b.auctionId-a.auctionId);
-
   renderItems(items);
   $id('catalogueMeta').textContent = `${items.length} item${items.length!==1?'s':''} found`;
 }
 
 function clearFilters(){
-  $id('fActive').checked = true;
-  $id('fEnded').checked  = false;
-  $id('fMinPrice').value = '';
-  $id('fMaxPrice').value = '';
+  $id('fActive').checked = true; $id('fEnded').checked = false;
+  $id('fMinPrice').value = ''; $id('fMaxPrice').value = '';
   document.querySelector('input[name=fTime][value=""]').checked = true;
   $id('sortSelect').value = 'default';
   applyFilters();
@@ -813,22 +851,13 @@ function renderItems(items){
     c.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><span class="icon">🔍</span><h3>No auctions found</h3><p>Try adjusting your filters or search terms</p></div>`;
     return;
   }
-  if(viewMode === 'list'){
-    c.innerHTML = items.map(i => renderListCard(i)).join('');
-  } else {
-    c.innerHTML = items.map(i => renderGridCard(i)).join('');
-  }
+  c.innerHTML = viewMode === 'list' ? items.map(renderListCard).join('') : items.map(renderGridCard).join('');
 }
 
 function renderGridCard(i){
-  const ep    = parseEpoch(i.endTime);
-  const rem   = remSec(ep);
-  const ended = isEnded(i);
-  const sel   = currentSel?.auction_id == i.auctionId;
-  const hot   = !ended && rem < 3600;
+  const ep=parseEpoch(i.endTime), rem=remSec(ep), ended=isEnded(i), sel=currentSel?.auction_id==i.auctionId, hot=!ended&&rem<3600;
   return `<div class="item-card${sel?' selected':''}" onclick="setSelection(${i.auctionId})">
-    <div class="item-img">
-      <span class="emoji">${itemEmoji(i.itemName)}</span>
+    <div class="item-img"><span class="emoji">${itemEmoji(i.itemName)}</span>
       <span class="item-badge ${ended?'badge-ended':'badge-live'}">${ended?'ENDED':'LIVE'}</span>
       ${hot?'<span class="badge-hot">🔥 HOT</span>':''}
     </div>
@@ -836,42 +865,25 @@ function renderGridCard(i){
       <div class="item-name">${esc(i.itemName)}</div>
       <div class="item-desc">${esc(i.description||'')}</div>
       <div class="item-price-row">
-        <div>
-          <div class="item-price">$${money(i.currentPrice)}</div>
-          <div class="item-start">Start: $${money(i.startingPrice)}</div>
-        </div>
-        <div class="item-timer${hot&&!ended?' ending':''}">
-          <div class="dot"></div>
-          <span data-end="${ep||''}">${ended?'Ended':fmtTime(rem)}</span>
-        </div>
+        <div><div class="item-price">$${money(i.currentPrice)}</div><div class="item-start">Start: $${money(i.startingPrice)}</div></div>
+        <div class="item-timer${hot&&!ended?' ending':''}"><div class="dot"></div><span data-end="${ep||''}">${ended?'Ended':fmtTime(rem)}</span></div>
       </div>
       <div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap;">${(i.keywords||'').split(',').slice(0,3).map(k=>`<span class="tag">${esc(k.trim())}</span>`).join('')}</div>
     </div>
-    <div class="item-footer">
-      <button class="btn-select${sel?' selected':''}" onclick="event.stopPropagation();setSelection(${i.auctionId})">${sel?'✓ Selected':'Bid Now'}</button>
-    </div>
+    <div class="item-footer"><button class="btn-select${sel?' selected':''}" onclick="event.stopPropagation();setSelection(${i.auctionId})">${sel?'✓ Selected':'Bid Now'}</button></div>
   </div>`;
 }
 
 function renderListCard(i){
-  const ep    = parseEpoch(i.endTime);
-  const rem   = remSec(ep);
-  const ended = isEnded(i);
-  const sel   = currentSel?.auction_id == i.auctionId;
+  const ep=parseEpoch(i.endTime), rem=remSec(ep), ended=isEnded(i), sel=currentSel?.auction_id==i.auctionId;
   return `<div class="item-list-card${sel?' selected':''}" onclick="setSelection(${i.auctionId})">
-    <div class="item-list-img">
-      ${itemEmoji(i.itemName)}
-      <span class="item-badge ${ended?'badge-ended':'badge-live'}" style="position:absolute;top:8px;left:8px;">${ended?'ENDED':'LIVE'}</span>
-    </div>
+    <div class="item-list-img">${itemEmoji(i.itemName)}<span class="item-badge ${ended?'badge-ended':'badge-live'}" style="position:absolute;top:8px;left:8px;">${ended?'ENDED':'LIVE'}</span></div>
     <div class="item-list-body">
       <div class="item-list-info">
         <div class="item-name" style="font-size:.95rem;margin-bottom:4px;">${esc(i.itemName)}</div>
         <div class="item-desc" style="-webkit-line-clamp:1;margin-bottom:8px;">${esc(i.description||'')}</div>
         <div style="display:flex;gap:4px;">${(i.keywords||'').split(',').slice(0,4).map(k=>`<span class="tag">${esc(k.trim())}</span>`).join('')}</div>
-        <div class="item-timer${!ended&&rem<3600?' ending':''}" style="margin-top:8px;">
-          <div class="dot"></div>
-          <span data-end="${ep||''}">${ended?'Ended':fmtTime(rem)}</span>
-        </div>
+        <div class="item-timer${!ended&&rem<3600?' ending':''}" style="margin-top:8px;"><div class="dot"></div><span data-end="${ep||''}">${ended?'Ended':fmtTime(rem)}</span></div>
       </div>
       <div class="item-list-price">
         <span class="price-big">$${money(i.currentPrice)}</span>
@@ -882,19 +894,14 @@ function renderListCard(i){
   </div>`;
 }
 
-// ─── SELECTION ────────────────────────────────────────────────────────────────
 async function setSelection(auctionId){
   if(!getUser()){ openAuth('signin'); toast('info','Please sign in to bid'); return; }
   try{
     await api('POST','/session/selection',{auctionId},true,true);
-    await restoreSel();
-    renderItems(catCache.filter(i=>{
-      // re-render filtered list to update selected state
-      const c = $id('itemsContainer');
-      return true;
-    }));
-    applyFilters();
+    await restoreSel(); applyFilters();
     toast('success', `Auction #${auctionId} selected!`);
+    const u = getUser();
+    if(u) sseConnect(u.userId || u.id, auctionId);
   }catch(e){ toast('error', e.message); }
 }
 
@@ -903,95 +910,55 @@ async function restoreSel(){
   try{
     const d = await api('GET','/session/selection',null,true);
     if(!d?.auction_id){ currentSel=null; renderSelPanel(null); renderPayPanel(null); return; }
-    currentSel = d;
-    renderSelPanel(d);
-    renderPayPanel(d);
+    currentSel = d; renderSelPanel(d); renderPayPanel(d);
   }catch(_){ currentSel=null; renderSelPanel(null); renderPayPanel(null); }
 }
 
 function renderSelPanel(data){
   const el = $id('selBody');
-  if(!data){
-    el.innerHTML = `<div class="sel-empty"><span class="icon">👆</span><p>Click any auction card to select it and start bidding</p></div>`;
-    return;
-  }
-  const ep    = parseEpoch(data.end_time);
-  const rem   = remSec(ep);
-  const ended = isEnded(data);
-  const status= (data.status||'ACTIVE').toUpperCase();
+  if(!data){ el.innerHTML=`<div class="sel-empty"><span class="icon">👆</span><p>Click any auction card to select it and start bidding</p></div>`; return; }
+  const ep=parseEpoch(data.end_time), rem=remSec(ep), ended=isEnded(data), status=(data.status||'ACTIVE').toUpperCase();
   el.innerHTML = `
     <div class="sel-item-img">${itemEmoji(data.item_name)}</div>
     <div class="sel-item-name">${esc(data.item_name||'Item')}</div>
     <div class="sel-item-desc">${esc(data.description||'')}</div>
     <div class="stat-grid">
-      <div class="stat-box">
-        <div class="stat-label">Current Bid</div>
-        <div class="stat-val price">$${money(data.current_price)}</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">Status</div>
-        <div class="stat-val ${status==='ACTIVE'?'green':'red'}">${status}</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">Auction #</div>
-        <div class="stat-val">${data.auction_id}</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">Top Bidder</div>
-        <div class="stat-val">${data.highest_bidder_id ? 'User #'+data.highest_bidder_id : '—'}</div>
-      </div>
+      <div class="stat-box"><div class="stat-label">Current Bid</div><div class="stat-val price">$${money(data.current_price)}</div></div>
+      <div class="stat-box"><div class="stat-label">Status</div><div class="stat-val ${status==='ACTIVE'?'green':'red'}">${status}</div></div>
+      <div class="stat-box"><div class="stat-label">Auction #</div><div class="stat-val">${data.auction_id}</div></div>
+      <div class="stat-box"><div class="stat-label">Top Bidder</div><div class="stat-val">${data.highest_bidder_id?'User #'+data.highest_bidder_id:'—'}</div></div>
     </div>
     <div class="countdown-big${!ended&&rem<300?' ending':''}" id="countdownBig">
       <div class="label">⏱ Time Remaining</div>
       <div class="time" id="selCd" data-end="${ep||''}">${ended?'AUCTION ENDED':fmtTimeMono(rem)}</div>
     </div>
-    ${!ended ? `
-    <div class="bid-section">
-      <div class="bid-label">🏷 Place Your Bid</div>
+    ${!ended?`<div class="bid-section"><div class="bid-label">🏷 Place Your Bid</div>
       <div class="bid-input-row">
         <input id="bidAmount" type="number" step="1" min="${Math.floor(data.current_price)+1}" placeholder="$${Math.floor(data.current_price)+1}"/>
         <button onclick="placeBid()">Bid →</button>
       </div>
       <div class="bid-hint">Minimum bid: $${Math.floor(data.current_price)+1} (must be an integer)</div>
-    </div>` : ''}
-  `;
+    </div>`:''}`;
 }
 
 function renderPayPanel(data){
   const pp = $id('payPanel');
   if(!data){ pp.style.display='none'; return; }
-  pp.style.display = 'block';
-  const u        = getUser();
-  const ended    = isEnded(data);
-  const isWinner = Number(data.highest_bidder_id) === Number(u?.userId);
-  const completed= (data.status||'').toUpperCase() === 'COMPLETED';
-  const body     = $id('payBody');
-
-  if(completed){
-    body.innerHTML = `<div class="warn-msg ok">✓ Payment already completed for this auction.</div>`;
-    return;
-  }
-  if(!ended){
-    body.innerHTML = `<div class="warn-msg info">⏳ Auction still active. Payment becomes available once it ends.</div>`;
-    return;
-  }
-  if(!isWinner){
-    body.innerHTML = `<div class="warn-msg err">✕ You did not win this auction. The winner was User #${data.highest_bidder_id||'unknown'}.</div>`;
-    return;
-  }
-
-  // Winner — show payment form
-  const ship   = data.shipping_price    || 0;
-  const expShip= data.exp_shipping_price|| 0;
-  body.innerHTML = `
+  pp.style.display='block';
+  const u=getUser(), ended=isEnded(data), isWinner=Number(data.highest_bidder_id)===Number(u?.userId);
+  const completed=(data.status||'').toUpperCase()==='COMPLETED', body=$id('payBody');
+  if(completed){ body.innerHTML=`<div class="warn-msg ok">✓ Payment already completed for this auction.</div>`; return; }
+  if(!ended){ body.innerHTML=`<div class="warn-msg info">⏳ Auction still active. Payment becomes available once it ends.</div>`; return; }
+  if(!isWinner){ body.innerHTML=`<div class="warn-msg err">✕ You did not win this auction. The winner was User #${data.highest_bidder_id||'unknown'}.</div>`; return; }
+  const ship=data.shipping_price||0, expShip=data.exp_shipping_price||0;
+  body.innerHTML=`
     <div class="pay-winner-banner">🏆 Congratulations! You won with a bid of <strong>$${money(data.current_price)}</strong></div>
     <div class="order-summary" id="orderSummary">
       <div class="order-row"><span class="ok">Winning bid</span><span>$${money(data.current_price)}</span></div>
       <div class="order-row"><span class="ok">Shipping</span><span id="shipCost">$${money(ship)}</span></div>
       <div class="order-row"><span class="ok">Total</span><span id="orderTotal">$${money(Number(data.current_price)+Number(ship))}</span></div>
     </div>
-    <div class="form-field">
-      <label>Shipping Method</label>
+    <div class="form-field"><label>Shipping Method</label>
       <select id="expedited" onchange="updateOrderTotal(${data.current_price},${ship},${expShip})">
         <option value="false">Standard — $${money(ship)} (~${data.shipping_days||7} days)</option>
         <option value="true">Expedited — $${money(expShip)} (~3 days)</option>
@@ -1005,109 +972,65 @@ function renderPayPanel(data){
         <div style="text-align:right;"><div style="font-size:.65rem;opacity:.6;margin-bottom:2px;">EXPIRES</div><span id="previewExp">MM/YY</span></div>
       </div>
     </div>
+    <div class="form-row"><div class="form-field" style="grid-column:1/-1;"><label>Card Number</label>
+      <input id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" oninput="fmtCard(this);$id('previewNum').textContent=this.value||'•••• •••• •••• ••••'"/>
+    </div></div>
     <div class="form-row">
-      <div class="form-field" style="grid-column:1/-1;">
-        <label>Card Number</label>
-        <input id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" oninput="fmtCard(this);$id('previewNum').textContent=this.value||'•••• •••• •••• ••••'"/>
-      </div>
+      <div class="form-field"><label>Name on Card</label><input id="cardName" placeholder="John Smith" oninput="$id('previewName').textContent=this.value.toUpperCase()||'YOUR NAME'"/></div>
+      <div class="form-field"><label>Expiry Date</label><input id="expiryDate" placeholder="MM/YY" maxlength="5" oninput="fmtExp(this);$id('previewExp').textContent=this.value||'MM/YY'"/></div>
     </div>
     <div class="form-row">
-      <div class="form-field">
-        <label>Name on Card</label>
-        <input id="cardName" placeholder="John Smith" oninput="$id('previewName').textContent=this.value.toUpperCase()||'YOUR NAME'"/>
-      </div>
-      <div class="form-field">
-        <label>Expiry Date</label>
-        <input id="expiryDate" placeholder="MM/YY" maxlength="5" oninput="fmtExp(this);$id('previewExp').textContent=this.value||'MM/YY'"/>
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-field">
-        <label>CVV</label>
-        <input id="securityCode" placeholder="123" maxlength="4" type="password"/>
-      </div>
+      <div class="form-field"><label>CVV</label><input id="securityCode" placeholder="123" maxlength="4" type="password"/></div>
       <div class="form-field"></div>
     </div>
-    <button class="pay-btn" onclick="submitPayment()">🔒 Pay $<span id="payBtnAmt">${money(Number(data.current_price)+Number(ship))}</span> Securely</button>
-  `;
+    <button class="pay-btn" onclick="submitPayment()">🔒 Pay $<span id="payBtnAmt">${money(Number(data.current_price)+Number(ship))}</span> Securely</button>`;
 }
 
-function fmtCard(inp){
-  let v = inp.value.replace(/\D/g,'').slice(0,16);
-  inp.value = v.replace(/(\d{4})(?=\d)/g,'$1 ');
-}
-function fmtExp(inp){
-  let v = inp.value.replace(/\D/g,'').slice(0,4);
-  if(v.length>2) v = v.slice(0,2)+'/'+v.slice(2);
-  inp.value = v;
-}
-function updateOrderTotal(bid, ship, expShip){
-  const exp  = $id('expedited')?.value === 'true';
-  const sc   = exp ? expShip : ship;
-  const total= Number(bid) + Number(sc);
-  if($id('shipCost'))  $id('shipCost').textContent  = '$'+money(sc);
-  if($id('orderTotal'))$id('orderTotal').textContent= '$'+money(total);
-  if($id('payBtnAmt')) $id('payBtnAmt').textContent = money(total);
+function fmtCard(inp){ let v=inp.value.replace(/\D/g,'').slice(0,16); inp.value=v.replace(/(\d{4})(?=\d)/g,'$1 '); }
+function fmtExp(inp){ let v=inp.value.replace(/\D/g,'').slice(0,4); if(v.length>2) v=v.slice(0,2)+'/'+v.slice(2); inp.value=v; }
+function updateOrderTotal(bid,ship,expShip){
+  const exp=$id('expedited')?.value==='true', sc=exp?expShip:ship, total=Number(bid)+Number(sc);
+  if($id('shipCost'))  $id('shipCost').textContent='$'+money(sc);
+  if($id('orderTotal'))$id('orderTotal').textContent='$'+money(total);
+  if($id('payBtnAmt')) $id('payBtnAmt').textContent=money(total);
 }
 
-// ─── BIDDING ──────────────────────────────────────────────────────────────────
 async function placeBid(){
   if(!getUser()){ openAuth('signin'); return; }
-  const inp = $id('bidAmount');
-  const val = inp?.value;
+  const inp=$id('bidAmount'), val=inp?.value;
   if(!val){ toast('error','Enter a bid amount'); return; }
-  const bidAmount = Number(val);
-  if(!Number.isInteger(bidAmount) || bidAmount <= 0){ toast('error','Bid must be a positive whole number'); return; }
+  const bidAmount=Number(val);
+  if(!Number.isInteger(bidAmount)||bidAmount<=0){ toast('error','Bid must be a positive whole number'); return; }
   if(String(val).includes('.')){ toast('error','Bids must be integers — no decimals'); return; }
   try{
-    const d = await api('POST','/bids',{bidAmount},true,true);
+    const d=await api('POST','/bids',{bidAmount},true,true);
     toast('success',`Bid $${money(d.newPrice)} accepted! You're the top bidder.`);
     if(inp) inp.value='';
-    await restoreSel();
-    applyFilters();
+    await restoreSel(); applyFilters();
   }catch(e){ toast('error', e.message); }
 }
 
-// ─── PAYMENT ──────────────────────────────────────────────────────────────────
 async function submitPayment(){
   if(!getUser()){ openAuth('signin'); return; }
   if(!currentSel?.auction_id){ toast('error','No auction selected'); return; }
-  const cardNum  = $id('cardNumber')?.value.replace(/\s/g,'');
-  const cardName = $id('cardName')?.value.trim();
-  const expiry   = $id('expiryDate')?.value.trim();
-  const cvv      = $id('securityCode')?.value.trim();
-  const exp      = $id('expedited')?.value === 'true';
-
-  // Client-side validation
-  if(!cardNum || !cardName || !expiry || !cvv){ toast('error','All payment fields are required'); return; }
-  if(cardNum.length < 13 || cardNum.length > 16){ toast('error','Enter a valid card number'); return; }
+  const cardNum=$id('cardNumber')?.value.replace(/\s/g,''), cardName=$id('cardName')?.value.trim();
+  const expiry=$id('expiryDate')?.value.trim(), cvv=$id('securityCode')?.value.trim();
+  const exp=$id('expedited')?.value==='true';
+  if(!cardNum||!cardName||!expiry||!cvv){ toast('error','All payment fields are required'); return; }
+  if(cardNum.length<13||cardNum.length>16){ toast('error','Enter a valid card number'); return; }
   if(!/^\d{2}\/\d{2}$/.test(expiry)){ toast('error','Expiry must be MM/YY format'); return; }
-  if(cvv.length < 3){ toast('error','Enter a valid CVV'); return; }
-
+  if(cvv.length<3){ toast('error','Enter a valid CVV'); return; }
   try{
-    const d = await api('POST','/payments/pay',{
-      auctionId: Number(currentSel.auction_id),
-      expeditedShipping: exp,
-      cardNumber: cardNum,
-      cardName,
-      expiryDate: expiry,
-      securityCode: cvv,
-    }, true, true);
-    renderReceipt(d);
-    toast('success','Payment successful! Your receipt is ready.');
-    await restoreSel();
-    applyFilters();
+    const d=await api('POST','/payments/pay',{auctionId:Number(currentSel.auction_id),expeditedShipping:exp,cardNumber:cardNum,cardName,expiryDate:expiry,securityCode:cvv},true,true);
+    renderReceipt(d); toast('success','Payment successful! Your receipt is ready.');
+    await restoreSel(); applyFilters();
   }catch(e){ toast('error', e.message); }
 }
 
 function renderReceipt(d){
-  $id('payBody').innerHTML = `
+  $id('payBody').innerHTML=`
     <div class="receipt-card">
-      <div class="receipt-top">
-        <div class="check">✅</div>
-        <h3>Payment Successful</h3>
-        <p>Order #${d.paymentId||'—'} · ${new Date().toLocaleDateString()}</p>
-      </div>
+      <div class="receipt-top"><div class="check">✅</div><h3>Payment Successful</h3><p>Order #${d.paymentId||'—'} · ${new Date().toLocaleDateString()}</p></div>
       <div class="receipt-body">
         <div class="receipt-line"><span class="rk">Item</span><span>${esc(d.itemName||'')}</span></div>
         <div class="receipt-line"><span class="rk">Winner</span><span>${esc(d.recipientName||('User #'+(d.winnerId||'')))}</span></div>
@@ -1117,167 +1040,190 @@ function renderReceipt(d){
         <div class="receipt-line"><span class="rk">Total Paid</span><span>$${money(d.totalAmount)}</span></div>
       </div>
     </div>
-    <div style="text-align:center;margin-top:12px;">
-      <span class="ship-badge">📦 Ships in ~${d.shippingDays||7} business days</span>
-    </div>
-  `;
+    <div style="text-align:center;margin-top:12px;"><span class="ship-badge">📦 Ships in ~${d.shippingDays||7} business days</span></div>`;
 }
 
-// ─── SELLER ───────────────────────────────────────────────────────────────────
 async function uploadAuctionItem(){
   if(!getUser()){ openAuth('signin'); return; }
-  const itemName   = $id('itemName').value.trim();
-  const description= $id('description').value.trim();
-  const keywords   = $id('keywords').value.trim();
-  const startingPrice     = Number($id('startingPrice').value);
-  const durationMinutes   = Number($id('durationMinutes').value);
-  const shippingPrice     = Number($id('shippingPrice').value)||0;
-  const expeditedShippingPrice= Number($id('expeditedPrice').value)||0;
-  const shippingDays      = Number($id('shippingDays').value)||7;
-
-  if(!itemName)        { toast('error','Item name is required'); return; }
-  if(!description)     { toast('error','Description is required'); return; }
-  if(!keywords)        { toast('error','Keywords are required'); return; }
+  const itemName=$id('itemName').value.trim(), description=$id('description').value.trim();
+  const keywords=$id('keywords').value.trim(), startingPrice=Number($id('startingPrice').value);
+  const durationMinutes=Number($id('durationMinutes').value), shippingPrice=Number($id('shippingPrice').value)||0;
+  const expeditedShippingPrice=Number($id('expeditedPrice').value)||0, shippingDays=Number($id('shippingDays').value)||7;
+  if(!itemName){ toast('error','Item name is required'); return; }
+  if(!description){ toast('error','Description is required'); return; }
+  if(!keywords){ toast('error','Keywords are required'); return; }
   if(!startingPrice||startingPrice<=0||!Number.isInteger(startingPrice)){ toast('error','Starting price must be a positive integer'); return; }
   if(!durationMinutes||durationMinutes<=0||!Number.isInteger(durationMinutes)){ toast('error','Duration must be a positive integer (minutes)'); return; }
-
   try{
-    const d = await api('POST','/seller/auctions',{
-      itemName, description, startingPrice, durationMinutes,
-      keywords, shippingPrice, expeditedShippingPrice, shippingDays,
-    },false,true);
-    $id('sellerMsg').innerHTML = `<span style="color:var(--green)">✓ Listed! Auction #${d.auctionId} · Item #${d.itemId} · Starting $${money(d.startingPrice)}</span>`;
+    const d=await api('POST','/seller/auctions',{itemName,description,startingPrice,durationMinutes,keywords,shippingPrice,expeditedShippingPrice,shippingDays},false,true);
+    $id('sellerMsg').innerHTML=`<span style="color:var(--green)">✓ Listed! Auction #${d.auctionId} · Item #${d.itemId} · Starting $${money(d.startingPrice)}</span>`;
     toast('success','Item listed successfully!');
-    // Clear form
     ['itemName','description','keywords'].forEach(id=>{ const e=$id(id); if(e)e.value=''; });
     ['startingPrice','durationMinutes','shippingPrice','expeditedPrice','shippingDays'].forEach(id=>{ const e=$id(id); if(e)e.value=''; });
     await loadCatalogue();
   }catch(e){ toast('error', e.message); }
 }
 
-// ─── SYNC & COUNTDOWN ────────────────────────────────────────────────────────
 function tickCountdown(){
-  const now = Math.floor(Date.now()/1000);
+  const now=Math.floor(Date.now()/1000);
   document.querySelectorAll('[data-end]').forEach(el=>{
-    const ep = Number(el.getAttribute('data-end'));
-    if(!ep) return;
-    const r = Math.max(0, ep - now);
-    if(el.id === 'selCd'){
-      el.textContent = r===0 ? 'AUCTION ENDED' : fmtTimeMono(r);
-      const big = $id('countdownBig');
-      if(big) big.classList.toggle('ending', r>0&&r<300);
-    } else {
-      el.textContent = r===0 ? 'Ended' : fmtTime(r);
-      el.classList.toggle('ending', r>0&&r<3600);
-    }
+    const ep=Number(el.getAttribute('data-end')); if(!ep) return;
+    const r=Math.max(0,ep-now);
+    if(el.id==='selCd'){ el.textContent=r===0?'AUCTION ENDED':fmtTimeMono(r); const big=$id('countdownBig'); if(big)big.classList.toggle('ending',r>0&&r<300); }
+    else{ el.textContent=r===0?'Ended':fmtTime(r); el.classList.toggle('ending',r>0&&r<3600); }
   });
 }
 function startSync(){
   if(cdTimer) return;
-  cdTimer   = setInterval(tickCountdown, 1000);
-  syncTimer = setInterval(async()=>{
-    await Promise.allSettled([loadCatalogue(), restoreSel()]);
-  }, 5000);
+  cdTimer=setInterval(tickCountdown,1000);
+  syncTimer=setInterval(async()=>{ await Promise.allSettled([loadCatalogue(),restoreSel()]); },5000);
 }
-function stopSync(){
-  clearInterval(cdTimer); cdTimer=null;
-  clearInterval(syncTimer); syncTimer=null;
-}
+function stopSync(){ clearInterval(cdTimer);cdTimer=null;clearInterval(syncTimer);syncTimer=null; }
 
-// ─── AI CHATBOT ───────────────────────────────────────────────────────────────
 function toggleAI(){
-  aiOpen = !aiOpen;
-  $id('aiPanel').classList.toggle('open', aiOpen);
-  if(aiOpen && $id('aiMessages').children.length === 0){
-    appendMsg('bot', "Hi! I'm Atlas AI 🤖 I can help you with bidding strategy, explain how auctions work, or answer questions about specific listings. What would you like to know?");
-  }
+  aiOpen=!aiOpen; $id('aiPanel').classList.toggle('open',aiOpen);
+  if(aiOpen&&$id('aiMessages').children.length===0)
+    appendMsg('bot',"Hi! I'm Atlas AI 🤖 I can help you with bidding strategy, explain how auctions work, or answer questions about specific listings. What would you like to know?");
 }
-function appendMsg(role, text){
-  const c = $id('aiMessages');
-  const u = getUser();
-  const init = role==='bot' ? '🤖' : (u?.email?.[0]?.toUpperCase()||'U');
-  const div = document.createElement('div');
-  div.className = 'msg ' + role;
-  div.innerHTML = `<div class="msg-av">${init}</div><div class="msg-bubble">${esc(text).replace(/\n/g,'<br/>')}</div>`;
-  c.appendChild(div);
-  c.scrollTop = c.scrollHeight;
+function appendMsg(role,text){
+  const c=$id('aiMessages'), u=getUser(), init=role==='bot'?'🤖':(u?.email?.[0]?.toUpperCase()||'U');
+  const div=document.createElement('div'); div.className='msg '+role;
+  div.innerHTML=`<div class="msg-av">${init}</div><div class="msg-bubble">${esc(text).replace(/\n/g,'<br/>')}</div>`;
+  c.appendChild(div); c.scrollTop=c.scrollHeight;
 }
 function showTyping(){
-  const c = $id('aiMessages');
-  const div = document.createElement('div');
+  const c=$id('aiMessages'), div=document.createElement('div');
   div.className='msg bot'; div.id='aiTyping';
   div.innerHTML=`<div class="msg-av">🤖</div><div class="msg-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
   c.appendChild(div); c.scrollTop=c.scrollHeight;
 }
 function hideTyping(){ $id('aiTyping')?.remove(); }
-
-// buildAIContext returns LIVE DATA only — system prompt lives in GeminiChatService.java
 function buildAIContext(){
-  const u = getUser();
-  const activeItems = catCache.filter(i=>!isEnded(i));
-  const itemSummary = activeItems.slice(0,10).map(i=>
-    `- "${i.itemName}" (Auction #${i.auctionId}): current bid $${money(i.currentPrice)}, ${fmtTime(remSec(parseEpoch(i.endTime)))} remaining, ships $${money(i.shippingPrice)}`
-  ).join('\n');
-  const selInfo = currentSel
-    ? `Currently selected: Auction #${currentSel.auction_id} "${currentSel.item_name}", price $${money(currentSel.current_price)}, status: ${currentSel.status}`
-    : 'No auction currently selected.';
-  return [
-    `User: ${u ? u.email + ' (Role: ' + u.role + ')' : 'Not logged in'}`,
-    selInfo,
-    `Active auctions (${activeItems.length} total):`,
-    itemSummary || 'None right now.'
-  ].join('\n');
+  const u=getUser(), activeItems=catCache.filter(i=>!isEnded(i));
+  const itemSummary=activeItems.slice(0,10).map(i=>`- "${i.itemName}" (Auction #${i.auctionId}): current bid $${money(i.currentPrice)}, ${fmtTime(remSec(parseEpoch(i.endTime)))} remaining, ships $${money(i.shippingPrice)}`).join('\n');
+  const selInfo=currentSel?`Currently selected: Auction #${currentSel.auction_id} "${currentSel.item_name}", price $${money(currentSel.current_price)}, status: ${currentSel.status}`:'No auction currently selected.';
+  return [`User: ${u?u.email+' (Role: '+u.role+')':'Not logged in'}`,selInfo,`Active auctions (${activeItems.length} total):`,itemSummary||'None right now.'].join('\n');
 }
-
 async function sendAI(){
-  const inp = $id('aiInput');
-  const msg = inp.value.trim();
-  if(!msg) return;
-  inp.value = '';
-  $id('aiSugs').style.display = 'none';
-  appendMsg('user', msg);
-  showTyping();
+  const inp=$id('aiInput'), msg=inp.value.trim(); if(!msg) return;
+  inp.value=''; $id('aiSugs').style.display='none'; appendMsg('user',msg); showTyping();
   try{
-    // Calls our Spring Boot backend proxy → Google Vertex AI Gemini (UC8)
-    const res = await fetch('/api/ai/chat', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        message: msg,
-        context: buildAIContext()
-      })
-    });
-    const d = await res.json();
-    hideTyping();
-    if(d.error){
-      // Show a friendly message — never expose raw API errors to users
-      const msg = d.error.includes('not configured')
-        ? "The AI assistant isn't configured yet. Ask your admin to set the Gemini API key."
-        : "I'm having a moment — please try again shortly.";
-      appendMsg('bot', msg);
-      return;
-    }
-    appendMsg('bot', d.response || "Sorry, I couldn't generate a response right now.");
-  }catch(e){
-    hideTyping();
-    appendMsg('bot', "I'm having trouble connecting to the AI right now. Make sure the backend is running and your Google Cloud project ID is configured in application.properties.");
-  }
+    const res=await fetch('/api/ai/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,context:buildAIContext()})});
+    const d=await res.json(); hideTyping();
+    if(d.error){ appendMsg('bot',d.error.includes('not configured')?"The AI assistant isn't configured yet. Ask your admin to set the Gemini API key.":"I'm having a moment — please try again shortly."); return; }
+    appendMsg('bot',d.response||"Sorry, I couldn't generate a response right now.");
+  }catch(e){ hideTyping(); appendMsg('bot',"I'm having trouble connecting to the AI right now."); }
 }
 function aiQuick(msg){ $id('aiInput').value=msg; sendAI(); }
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 window.addEventListener('load', ()=>{
   loadCatalogue();
-  const saved = localStorage.getItem(SK);
-  if(saved){
-    try{
-      currentUser = JSON.parse(saved);
-      showLoggedIn(currentUser);
-      startSync();
-      restoreSel();
-    }catch(_){ clearUser(); }
-  }
+  const saved=localStorage.getItem(SK);
+  if(saved){ try{ currentUser=JSON.parse(saved); showLoggedIn(currentUser); startSync(); restoreSel(); }catch(_){ clearUser(); } }
 });
+
+// ─── SSE / PUB-SUB ───────────────────────────────────────────────────────────
+function sseConnect(userId, auctionId) {
+  if (!userId || isNaN(Number(userId))) return;
+  sseDisconnect();
+  const url = auctionId
+    ? `/api/notifications/subscribe?userId=${userId}&auctionId=${auctionId}`
+    : `/api/notifications/subscribe?userId=${userId}`;
+  sseConn = new EventSource(url);
+  sseConn.addEventListener('connected', () => setSseDot(true));
+  sseConn.addEventListener('BID_PLACED', e => {
+    const d=JSON.parse(e.data), p=d.data, u=getUser();
+    const isOutbid=u&&p.outbidUserId&&String(p.outbidUserId)===String(u.userId||u.id);
+    const isBidder=u&&String(p.bidderId)===String(u.userId||u.id);
+    if(isOutbid){
+      pushNotif('bid', `⚡ You've been outbid!`, `${p.itemName}: new price is $${Number(p.newPrice).toFixed(2)}`);
+      toast('error', `You were outbid on ${p.itemName}! New price: $${Number(p.newPrice).toFixed(2)}`);
+    } else if(!isBidder){
+      pushNotif('bid','💰 New bid placed',`${p.itemName}: $${Number(p.newPrice).toFixed(2)} (was $${Number(p.oldPrice).toFixed(2)})`);
+      toast('info',`New bid on ${p.itemName}: $${Number(p.newPrice).toFixed(2)}`);
+    }
+    if(currentSel&&currentSel.auction_id==p.auctionId) restoreSel();
+  });
+  sseConn.addEventListener('AUCTION_ENDED', e => {
+    const d=JSON.parse(e.data), p=d.data, u=getUser();
+    const isWinner=u&&String(p.winnerId)===String(u.userId||u.id);
+    if(isWinner){
+      pushNotif('ended','🏆 You won the auction!',`${p.itemName} — final price $${Number(p.finalPrice).toFixed(2)}. Pay now!`);
+      toast('success',`🏆 You won ${p.itemName}! Final price: $${Number(p.finalPrice).toFixed(2)}`);
+    } else {
+      pushNotif('ended','🔔 Auction ended',`${p.itemName} closed at $${Number(p.finalPrice).toFixed(2)}`);
+      toast('info',`Auction ended: ${p.itemName} ($${Number(p.finalPrice).toFixed(2)})`);
+    }
+    if(currentSel&&currentSel.auction_id==p.auctionId) restoreSel();
+    loadCatalogue();
+  });
+  sseConn.addEventListener('AUCTION_CREATED', e => {
+    const d=JSON.parse(e.data), p=d.data;
+    pushNotif('created','🆕 New auction listed',`${p.itemName} — starting at $${Number(p.startingPrice).toFixed(2)}`);
+    toast('info',`New auction: ${p.itemName} — starting at $${Number(p.startingPrice).toFixed(2)}`);
+    loadCatalogue();
+  });
+  sseConn.addEventListener('PAYMENT_CONFIRMED', e => {
+    const d=JSON.parse(e.data), p=d.data;
+    pushNotif('payment','✅ Payment confirmed',`${p.itemName} — $${Number(p.totalAmount).toFixed(2)} paid. Ships in ${p.shippingDays} day(s).`);
+    toast('success',`Payment confirmed for ${p.itemName}!`);
+  });
+  sseConn.onerror = () => {
+    setSseDot(false);
+    setTimeout(()=>{ const u=getUser(); if(u) sseConnect(u.userId||u.id,currentSel?.auction_id); },5000);
+  };
+}
+function sseDisconnect(){
+  if(sseConn){ sseConn.close(); sseConn=null; }
+  setSseDot(false);
+  $id('notifBell').style.display='none';
+}
+function setSseDot(live){
+  const dot=$id('sseDot'), label=$id('sseLabel'), nd=$id('notifSseDot');
+  if(dot)  dot.classList.toggle('live',live);
+  if(label)label.textContent=live?'live':'offline';
+  if(nd)   nd.classList.toggle('live',live);
+}
+
+// ─── NOTIFICATION PANEL ───────────────────────────────────────────────────────
+function toggleNotifPanel(){
+  notifOpen=!notifOpen; $id('notifPanel').classList.toggle('open',notifOpen);
+  if(notifOpen){ notifications.forEach(n=>n.unread=false); unreadCount=0; updateBadge(); renderNotifList(); }
+}
+function pushNotif(type,title,msg){
+  const n={id:Date.now(),type,title,msg,ts:new Date(),unread:true};
+  notifications.unshift(n); if(notifications.length>50) notifications.pop();
+  unreadCount++; updateBadge(); if(notifOpen) renderNotifList();
+  const bell=$id('notifBell'); bell.classList.remove('ring'); void bell.offsetWidth; bell.classList.add('ring');
+  setTimeout(()=>bell.classList.remove('ring'),600);
+}
+function updateBadge(){
+  const badge=$id('notifBadge');
+  if(unreadCount>0){ badge.textContent=unreadCount>99?'99+':unreadCount; badge.classList.add('show'); }
+  else badge.classList.remove('show');
+}
+function clearNotifications(){ notifications=[]; unreadCount=0; updateBadge(); renderNotifList(); }
+function renderNotifList(){
+  const list=$id('notifList'), empty=$id('notifEmpty');
+  if(!notifications.length){ empty.style.display=''; list.querySelectorAll('.notif-item').forEach(el=>el.remove()); return; }
+  empty.style.display='none'; list.querySelectorAll('.notif-item').forEach(el=>el.remove());
+  const iconMap={bid:'bid',ended:'ended',created:'created',payment:'payment'};
+  const emojiMap={bid:'💰',ended:'🔔',created:'🆕',payment:'✅'};
+  notifications.forEach(n=>{
+    const el=document.createElement('div'); el.className='notif-item'+(n.unread?' unread':'');
+    el.innerHTML=`<div class="notif-icon ${iconMap[n.type]||'bid'}">${emojiMap[n.type]||'🔔'}</div>
+      <div class="notif-body"><div class="notif-title">${esc(n.title)}</div><div class="notif-msg">${esc(n.msg)}</div><div class="notif-time">${fmtNotifTime(n.ts)}</div></div>`;
+    list.appendChild(el);
+  });
+}
+function fmtNotifTime(ts){
+  const diff=Math.floor((Date.now()-ts)/1000);
+  if(diff<10)  return 'just now';
+  if(diff<60)  return `${diff}s ago`;
+  if(diff<3600)return `${Math.floor(diff/60)}m ago`;
+  return ts.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+}
 </script>
 </body>
 </html>

@@ -1,19 +1,25 @@
 package com.yorku.auction.service;
 
+import com.yorku.auction.pubsub.AuctionEvent;
+import com.yorku.auction.pubsub.AuctionEventType;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Service
 public class PaymentService {
 
     private final JdbcTemplate jdbc;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public PaymentService(JdbcTemplate jdbc) {
-        this.jdbc = jdbc;
+    public PaymentService(JdbcTemplate jdbc, ApplicationEventPublisher eventPublisher) {
+        this.jdbc           = jdbc;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
@@ -138,6 +144,27 @@ public class PaymentService {
 
         // mark the auction as completed
         jdbc.update("UPDATE auctions SET status = 'COMPLETED' WHERE auction_id = ?", auctionId);
+
+        // ── PUBLISH: AUCTION_ENDED ───────────────────────────────────────────
+        // Notify every watcher of this auction that it's now closed
+        Map<String, Object> endedPayload = new LinkedHashMap<>();
+        endedPayload.put("auctionId",  auctionId);
+        endedPayload.put("itemName",   itemName);
+        endedPayload.put("winnerId",   highestBidderId);
+        endedPayload.put("finalPrice", currentPrice);
+        eventPublisher.publishEvent(
+            new AuctionEvent(this, AuctionEventType.AUCTION_ENDED, auctionId, endedPayload));
+
+        // ── PUBLISH: PAYMENT_CONFIRMED ───────────────────────────────────────
+        // Notify only the winning buyer — their receipt is ready
+        Map<String, Object> paidPayload = new LinkedHashMap<>();
+        paidPayload.put("userId",      userId);
+        paidPayload.put("auctionId",   auctionId);
+        paidPayload.put("itemName",    itemName);
+        paidPayload.put("totalAmount", totalAmount);
+        paidPayload.put("shippingDays", shippingDays);
+        eventPublisher.publishEvent(
+            new AuctionEvent(this, AuctionEventType.PAYMENT_CONFIRMED, auctionId, paidPayload));
 
         // response for the Front end
         resp.put("message", "Payment completed successfully");

@@ -16,9 +16,9 @@ VALUES
 
 INSERT OR IGNORE INTO auctions (item_id, seller_id, auction_type, end_time, current_price, status)
 VALUES 
-(1, (SELECT user_id FROM users WHERE username='seller1'), 'FORWARD', datetime('now','+2 minutes'), 1200.00, 'ACTIVE'),
-(2, (SELECT user_id FROM users WHERE username='seller1'), 'FORWARD', datetime('now','+1 day'), 999.00, 'ACTIVE'),
-(3, (SELECT user_id FROM users WHERE username='seller1'), 'FORWARD', datetime('now','+3 hours'), 350.00, 'ACTIVE');
+(1, (SELECT user_id FROM users WHERE username='seller1'), 'FORWARD', datetime('now','+30 days'), 1200.00, 'ACTIVE'),
+(2, (SELECT user_id FROM users WHERE username='seller1'), 'FORWARD', datetime('now','+7 days'),  999.00,  'ACTIVE'),
+(3, (SELECT user_id FROM users WHERE username='seller1'), 'FORWARD', datetime('now','+3 days'),  350.00,  'ACTIVE');
 
 
 -- User 4 
