@@ -14,7 +14,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - GEMINI_API_KEY=AIzaSyAbUuBLNcMsltPM_glaKMtfGqKBUIr-cw4
-      - SPRING_APPLICATION_JSON={"gemini.api.key":"AIzaSyBEetYqeF6Rr39PnqIqKuKG3aSwq7t8hqg"}
+      - SPRING_APPLICATION_JSON={"gemini.api.key":""}
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:8080/api/catalogue/items/active"]
