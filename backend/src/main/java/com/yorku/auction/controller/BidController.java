@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestController
@@ -21,7 +22,7 @@ public class BidController {
         this.bidService = bidService;
     }
 
-    //Place a bid on the selected auction per session
+    // UC3: Place a bid on the session-selected auction
     @PostMapping
     public ResponseEntity<?> placeBid(
             @RequestHeader("X-Session-Id") String sessionId,
@@ -29,7 +30,17 @@ public class BidController {
             @Valid @RequestBody PlaceBidRequest request
     ) {
         try {
-            return ResponseEntity.ok(bidService.placeBid(sessionId, userId, request.bidAmount));
+            Map<String, Object> result = new LinkedHashMap<>(
+                (Map<String, Object>) bidService.placeBid(sessionId, userId, request.bidAmount)
+            );
+            // HATEOAS _links
+            Map<String, Object> links = new LinkedHashMap<>();
+            links.put("self",      Map.of("href", "/api/bids", "method", "POST"));
+            links.put("history",   Map.of("href", "/api/bids/{auctionId}", "method", "GET", "templated", true));
+            links.put("selection", Map.of("href", "/api/session/selection", "method", "GET"));
+            links.put("payment",   Map.of("href", "/api/payments/pay", "method", "POST"));
+            result.put("_links", links);
+            return ResponseEntity.ok(result);
         } catch (RuntimeException e) {
             Map<String, Object> err = new HashMap<>();
             err.put("error", e.getMessage());
@@ -37,7 +48,7 @@ public class BidController {
         }
     }
 
-    //Get bid history for a specific auction
+    // Get bid history for a specific auction
     @GetMapping("/{auctionId}")
     public ResponseEntity<?> getBidsForAuction(@PathVariable Long auctionId) {
         return ResponseEntity.ok(bidService.getBidsForAuction(auctionId));

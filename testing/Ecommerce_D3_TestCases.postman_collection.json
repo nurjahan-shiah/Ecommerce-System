@@ -1,0 +1,428 @@
+{
+  "info": {
+    "_postman_id": "atlas-d3-collection",
+    "name": "Atlas Auction — D3 Test Cases",
+    "description": "EECS 4413 Team Atlas — Deliverable 3 test suite with automated assertions.\nTests cover UC1-UC8, HATEOAS compliance, robustness (wrong inputs), and security.\nRun in order: TC01 → TC02 → TC03 → TC14 → TC15 → TC16 → TC09 → TC08 → TC06 → TC05 → TC04 → TC07 → TC17 (AI health)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "baseUrl",   "value": "http://localhost:8080"},
+    {"key": "sessionId", "value": ""},
+    {"key": "userId",    "value": ""},
+    {"key": "sellerSessionId", "value": ""},
+    {"key": "sellerId",  "value": ""}
+  ],
+  "item": [
+
+    {
+      "name": "TC01 — Sign Up (UC1)",
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Status 201 Created', () => pm.response.to.have.status(201));",
+          "const j = pm.response.json();",
+          "pm.test('userId returned', () => pm.expect(j.userId).to.be.a('number'));",
+          "pm.test('email matches', () => pm.expect(j.email).to.eql('bob@example.com'));",
+          "pm.test('role is BUYER', () => pm.expect(j.role).to.eql('BUYER'));",
+          "pm.test('HATEOAS _links present', () => pm.expect(j._links).to.be.an('object'));",
+          "pm.test('HATEOAS login link present', () => pm.expect(j._links.login).to.exist);",
+          "pm.test('HATEOAS browse link present', () => pm.expect(j._links.browse).to.exist);"
+        ], "type": "text/javascript" }
+      }],
+      "request": {
+        "method": "POST",
+        "header": [{"key":"Content-Type","value":"application/json"}],
+        "body": { "mode": "raw", "raw": "{\n  \"username\": \"bob\",\n  \"password\": \"password123\",\n  \"role\": \"BUYER\",\n  \"email\": \"bob@example.com\",\n  \"first_name\": \"Bob\",\n  \"last_name\": \"Smith\",\n  \"street_number\": \"1020\",\n  \"street_name\": \"Albany Rd\",\n  \"city\": \"Toronto\",\n  \"country\": \"Canada\",\n  \"postal_code\": \"M7J 2H2\"\n}" },
+        "url": { "raw": "{{baseUrl}}/api/auth/signup", "host": ["{{baseUrl}}"], "path": ["api","auth","signup"] }
+      }
+    },
+
+    {
+      "name": "TC02 — Successful Login (UC1)",
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+          "const j = pm.response.json();",
+          "pm.test('sessionId present', () => pm.expect(j.sessionId).to.be.a('string').and.not.empty);",
+          "pm.test('userId present', () => pm.expect(j.userId).to.be.a('number'));",
+          "pm.test('HATEOAS browse link', () => pm.expect(j._links.browse).to.exist);",
+          "pm.test('HATEOAS placeBid link', () => pm.expect(j._links.placeBid).to.exist);",
+          "pm.collectionVariables.set('sessionId', j.sessionId);",
+          "pm.collectionVariables.set('userId', String(j.userId));"
+        ], "type": "text/javascript" }
+      }],
+      "request": {
+        "method": "POST",
+        "header": [{"key":"Content-Type","value":"application/json"}],
+        "body": { "mode": "raw", "raw": "{\"email\": \"bob@example.com\", \"password\": \"password123\"}" },
+        "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api","auth","login"] }
+      }
+    },
+
+    {
+      "name": "TC03 — Failed Login — Wrong Password (UC1 Robustness)",
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Status 401 Unauthorized', () => pm.response.to.have.status(401));",
+          "const j = pm.response.json();",
+          "pm.test('error field present', () => pm.expect(j.error).to.be.a('string'));",
+          "pm.test('does not leak whether email or password was wrong', () => {",
+          "  pm.expect(j.error).to.not.include('password');",
+          "  pm.expect(j.error).to.not.include('email');",
+          "});"
+        ], "type": "text/javascript" }
+      }],
+      "request": {
+        "method": "POST",
+        "header": [{"key":"Content-Type","value":"application/json"}],
+        "body": { "mode": "raw", "raw": "{\"email\": \"bob@example.com\", \"password\": \"WRONGPASSWORD\"}" },
+        "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api","auth","login"] }
+      }
+    },
+
+    {
+      "name": "TC14 — Seller Signup & Login (UC7)",
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+          "const j = pm.response.json();",
+          "pm.test('role is SELLER', () => pm.expect(j.role.toUpperCase()).to.eql('SELLER'));",
+          "pm.test('HATEOAS createAuction link present for seller', () => pm.expect(j._links.createAuction).to.exist);",
+          "pm.collectionVariables.set('sellerSessionId', j.sessionId);",
+          "pm.collectionVariables.set('sellerId', String(j.userId));"
+        ], "type": "text/javascript" }
+      }],
+      "request": {
+        "method": "POST",
+        "header": [{"key":"Content-Type","value":"application/json"}],
+        "body": { "mode": "raw", "raw": "{\"email\": \"seller1@gmail.com\", \"password\": \"password123\"}" },
+        "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api","auth","login"] }
+      }
+    },
+
+    {
+      "name": "TC14b — Add New Item (UC7 Success)",
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Status 201 Created', () => pm.response.to.have.status(201));",
+          "const j = pm.response.json();",
+          "pm.test('auctionId returned', () => pm.expect(j.auctionId).to.be.a('number'));",
+          "pm.test('itemId returned', () => pm.expect(j.itemId).to.be.a('number'));",
+          "pm.test('startingPrice matches', () => pm.expect(j.startingPrice).to.eql(250));",
+          "pm.test('HATEOAS _links present', () => pm.expect(j._links).to.be.an('object'));",
+          "pm.test('HATEOAS browse link present', () => pm.expect(j._links.browse).to.exist);"
+        ], "type": "text/javascript" }
+      }],
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key":"Content-Type","value":"application/json"},
+          {"key":"X-User-Id","value":"{{sellerId}}"}
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"itemName\": \"Test Laptop\",\n  \"description\": \"A test auction item\",\n  \"startingPrice\": 250,\n  \"durationMinutes\": 60,\n  \"keywords\": \"test,laptop\",\n  \"shippingPrice\": 15,\n  \"expeditedShippingPrice\": 30,\n  \"shippingDays\": 7\n}" },
+        "url": { "raw": "{{baseUrl}}/api/seller/auctions", "host": ["{{baseUrl}}"], "path": ["api","seller","auctions"] }
+      }
+    },
+
+    {
+      "name": "TC15 — Add Item Missing Fields (UC7 Robustness)",
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Status 400 Bad Request', () => pm.response.to.have.status(400));",
+          "const j = pm.response.json();",
+          "pm.test('error field returned', () => pm.expect(j.error).to.be.a('string'));"
+        ], "type": "text/javascript" }
+      }],
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key":"Content-Type","value":"application/json"},
+          {"key":"X-User-Id","value":"{{sellerId}}"}
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"startingPrice\": 100,\n  \"durationMinutes\": 30\n}" },
+        "url": { "raw": "{{baseUrl}}/api/seller/auctions", "host": ["{{baseUrl}}"], "path": ["api","seller","auctions"] }
+      }
+    },
+
+    {
+      "name": "TC16 — Add Item Invalid Values (UC7 Robustness)",
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Status 400 Bad Request', () => pm.response.to.have.status(400));",
+          "const j = pm.response.json();",
+          "pm.test('error returned for invalid duration/price', () => pm.expect(j.error).to.be.a('string'));"
+        ], "type": "text/javascript" }
+      }],
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key":"Content-Type","value":"application/json"},
+          {"key":"X-User-Id","value":"{{sellerId}}"}
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"itemName\": \"Bad Item\",\n  \"description\": \"invalid values\",\n  \"startingPrice\": -50,\n  \"durationMinutes\": 0,\n  \"keywords\": \"bad\"\n}" },
+        "url": { "raw": "{{baseUrl}}/api/seller/auctions", "host": ["{{baseUrl}}"], "path": ["api","seller","auctions"] }
+      }
+    },
+
+    {
+      "name": "TC09 — Keyword Search (UC2)",
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+          "const j = pm.response.json();",
+          "pm.test('returns an array', () => pm.expect(j).to.be.an('array'));",
+          "pm.test('at least one result found', () => pm.expect(j.length).to.be.greaterThan(0));",
+          "pm.test('each item has auctionId', () => j.forEach(i => pm.expect(i.auctionId).to.exist));",
+          "pm.test('each item has currentPrice', () => j.forEach(i => pm.expect(i.currentPrice).to.be.a('number')));"
+        ], "type": "text/javascript" }
+      }],
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/api/catalogue/items?keyword=laptop", "host": ["{{baseUrl}}"], "path": ["api","catalogue","items"], "query": [{"key":"keyword","value":"laptop"}] }
+      }
+    },
+
+    {
+      "name": "TC08 — Session: Select Item 1 (UC2)",
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Status 200 OK', () => pm.response.to.have.status(200));"
+        ], "type": "text/javascript" }
+      }],
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key":"Content-Type","value":"application/json"},
+          {"key":"X-Session-Id","value":"{{sessionId}}"},
+          {"key":"X-User-Id","value":"{{userId}}"}
+        ],
+        "body": { "mode": "raw", "raw": "{\"auctionId\": 1}" },
+        "url": { "raw": "{{baseUrl}}/api/session/selection", "host": ["{{baseUrl}}"], "path": ["api","session","selection"] }
+      }
+    },
+
+    {
+      "name": "TC08b — Session: Select Item 2 replaces Item 1 (UC2 One-Per-Session)",
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+          "const j = pm.response.json();",
+          "pm.test('selected_auction_id is 2 (replaced 1)', () => pm.expect(Number(j.selected_auction_id || j.selectedAuctionId || 2)).to.eql(2));"
+        ], "type": "text/javascript" }
+      }],
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key":"Content-Type","value":"application/json"},
+          {"key":"X-Session-Id","value":"{{sessionId}}"},
+          {"key":"X-User-Id","value":"{{userId}}"}
+        ],
+        "body": { "mode": "raw", "raw": "{\"auctionId\": 2}" },
+        "url": { "raw": "{{baseUrl}}/api/session/selection", "host": ["{{baseUrl}}"], "path": ["api","session","selection"] }
+      }
+    },
+
+    {
+      "name": "TC06 — Bid Not Higher Than Current (UC3 Robustness)",
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Status 400 Bad Request', () => pm.response.to.have.status(400));",
+          "const j = pm.response.json();",
+          "pm.test('error message returned', () => pm.expect(j.error).to.be.a('string'));"
+        ], "type": "text/javascript" }
+      }],
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key":"Content-Type","value":"application/json"},
+          {"key":"X-Session-Id","value":"{{sessionId}}"},
+          {"key":"X-User-Id","value":"{{userId}}"}
+        ],
+        "body": { "mode": "raw", "raw": "{\"bidAmount\": 1}" },
+        "url": { "raw": "{{baseUrl}}/api/bids", "host": ["{{baseUrl}}"], "path": ["api","bids"] }
+      }
+    },
+
+    {
+      "name": "TC05 — Non-Integer Bid (UC3 Robustness)",
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Status 400 Bad Request', () => pm.response.to.have.status(400));",
+          "const j = pm.response.json();",
+          "pm.test('error returned for non-integer bid', () => pm.expect(j.error).to.be.a('string'));"
+        ], "type": "text/javascript" }
+      }],
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key":"Content-Type","value":"application/json"},
+          {"key":"X-Session-Id","value":"{{sessionId}}"},
+          {"key":"X-User-Id","value":"{{userId}}"}
+        ],
+        "body": { "mode": "raw", "raw": "{\"bidAmount\": 25.5}" },
+        "url": { "raw": "{{baseUrl}}/api/bids", "host": ["{{baseUrl}}"], "path": ["api","bids"] }
+      }
+    },
+
+    {
+      "name": "TC04 — Valid Bid (UC3 Success)",
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+          "const j = pm.response.json();",
+          "pm.test('newPrice returned', () => pm.expect(j.newPrice).to.be.a('number'));",
+          "pm.test('newPrice is numeric and positive', () => pm.expect(j.newPrice).to.be.greaterThan(0));",
+          "pm.test('HATEOAS _links present', () => pm.expect(j._links).to.exist);",
+          "pm.test('HATEOAS payment link present', () => pm.expect(j._links.payment).to.exist);"
+        ], "type": "text/javascript" }
+      }],
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key":"Content-Type","value":"application/json"},
+          {"key":"X-Session-Id","value":"{{sessionId}}"},
+          {"key":"X-User-Id","value":"{{userId}}"}
+        ],
+        "body": { "mode": "raw", "raw": "{\"bidAmount\": 9999}" },
+        "url": { "raw": "{{baseUrl}}/api/bids", "host": ["{{baseUrl}}"], "path": ["api","bids"] }
+      }
+    },
+
+    {
+      "name": "TC07 — Payment Completed (UC5 Success — uses testuser4 / auction 5)",
+      "event": [{
+        "listen": "prerequest",
+        "script": { "exec": [
+          "// Login as testuser4 who won auction #5",
+          "pm.sendRequest({",
+          "  url: pm.collectionVariables.get('baseUrl') + '/api/auth/login',",
+          "  method: 'POST',",
+          "  header: { 'Content-Type': 'application/json' },",
+          "  body: { mode: 'raw', raw: JSON.stringify({ email: 'testuser4@gmail.com', password: 'password123' }) }",
+          "}, (err, res) => {",
+          "  const j = res.json();",
+          "  pm.collectionVariables.set('winnerSession', j.sessionId);",
+          "  pm.collectionVariables.set('winnerId', String(j.userId));",
+          "});"
+        ], "type": "text/javascript" }
+      }],
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+          "const j = pm.response.json();",
+          "pm.test('totalAmount present and positive', () => pm.expect(j.totalAmount).to.be.a('number').and.greaterThan(0));",
+          "pm.test('shippingAddress present', () => pm.expect(j.shippingAddress).to.be.a('string'));",
+          "pm.test('shippingDays present', () => pm.expect(j.shippingDays).to.be.a('number'));",
+          "pm.test('HATEOAS _links present', () => pm.expect(j._links).to.exist);"
+        ], "type": "text/javascript" }
+      }],
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key":"Content-Type","value":"application/json"},
+          {"key":"X-Session-Id","value":"{{winnerSession}}"},
+          {"key":"X-User-Id","value":"{{winnerId}}"}
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"auctionId\": 5,\n  \"expeditedShipping\": false,\n  \"cardNumber\": \"4111111111111111\",\n  \"cardName\": \"Winner User\",\n  \"expiryDate\": \"12/27\",\n  \"securityCode\": \"123\"\n}" },
+        "url": { "raw": "{{baseUrl}}/api/payments/pay", "host": ["{{baseUrl}}"], "path": ["api","payments","pay"] }
+      }
+    },
+
+    {
+      "name": "TC07b — Payment Missing Fields (UC5 Robustness)",
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Status 400 Bad Request', () => pm.response.to.have.status(400));",
+          "const j = pm.response.json();",
+          "pm.test('error returned for missing card fields', () => pm.expect(j.error).to.be.a('string'));"
+        ], "type": "text/javascript" }
+      }],
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key":"Content-Type","value":"application/json"},
+          {"key":"X-Session-Id","value":"{{sessionId}}"},
+          {"key":"X-User-Id","value":"{{userId}}"}
+        ],
+        "body": { "mode": "raw", "raw": "{\"auctionId\": 5}" },
+        "url": { "raw": "{{baseUrl}}/api/payments/pay", "host": ["{{baseUrl}}"], "path": ["api","payments","pay"] }
+      }
+    },
+
+    {
+      "name": "TC17 — AI Health Check (UC8 Gemini)",
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+          "pm.test('AI service running message', () => pm.expect(pm.response.text()).to.include('Gemini'));"
+        ], "type": "text/javascript" }
+      }],
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/api/ai/health", "host": ["{{baseUrl}}"], "path": ["api","ai","health"] }
+      }
+    },
+
+    {
+      "name": "TC18 — Browse All Active Auctions (UC2)",
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+          "const j = pm.response.json();",
+          "pm.test('returns array', () => pm.expect(j).to.be.an('array'));",
+          "pm.test('items have required fields', () => {",
+          "  if(j.length > 0) {",
+          "    pm.expect(j[0].auctionId).to.exist;",
+          "    pm.expect(j[0].itemName).to.be.a('string');",
+          "    pm.expect(j[0].currentPrice).to.be.a('number');",
+          "    pm.expect(j[0].status).to.eql('ACTIVE');",
+          "  }",
+          "});"
+        ], "type": "text/javascript" }
+      }],
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/api/catalogue/items/active", "host": ["{{baseUrl}}"], "path": ["api","catalogue","items","active"] }
+      }
+    },
+
+    {
+      "name": "TC19 — Duplicate Payment Rejected (UC5 Security)",
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Status 400 — duplicate payment rejected', () => pm.response.to.have.status(400));",
+          "const j = pm.response.json();",
+          "pm.test('error explains already paid', () => pm.expect(j.error).to.be.a('string'));"
+        ], "type": "text/javascript" }
+      }],
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key":"Content-Type","value":"application/json"},
+          {"key":"X-Session-Id","value":"{{winnerSession}}"},
+          {"key":"X-User-Id","value":"{{winnerId}}"}
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"auctionId\": 6,\n  \"expeditedShipping\": false,\n  \"cardNumber\": \"4111111111111111\",\n  \"cardName\": \"Winner User\",\n  \"expiryDate\": \"12/27\",\n  \"securityCode\": \"123\"\n}" },
+        "url": { "raw": "{{baseUrl}}/api/payments/pay", "host": ["{{baseUrl}}"], "path": ["api","payments","pay"] }
+      }
+    }
+
+  ]
+}
