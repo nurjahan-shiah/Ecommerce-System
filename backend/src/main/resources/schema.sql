@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(50) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     role VARCHAR(50) NOT NULL,
-    email VARCHAR(50) NOT NULL,
+    email VARCHAR(50) UNIQUE NOT NULL,
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
     street_number VARCHAR(10),
@@ -15,10 +15,10 @@ CREATE TABLE IF NOT EXISTS users (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- Catalogue items
+-- Catalogue items — item_name UNIQUE prevents duplicate seed rows on restart
 CREATE TABLE IF NOT EXISTS catalogue_items (
     item_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    item_name VARCHAR(100) NOT NULL,
+    item_name VARCHAR(100) UNIQUE NOT NULL,
     description TEXT,
     starting_price DECIMAL(10,2) NOT NULL,
     shipping_price DECIMAL(10,2) DEFAULT 0,
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS catalogue_items (
 -- Auctions
 CREATE TABLE IF NOT EXISTS auctions (
     auction_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    item_id INTEGER NOT NULL,
+    item_id INTEGER NOT NULL UNIQUE,
     seller_id INTEGER NOT NULL,
     auction_type VARCHAR(20) DEFAULT 'FORWARD',
     start_time DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -79,4 +79,3 @@ CREATE TABLE IF NOT EXISTS session_selection (
     FOREIGN KEY (user_id) REFERENCES users(user_id),
     FOREIGN KEY (selected_auction_id) REFERENCES auctions(auction_id)
 );
-

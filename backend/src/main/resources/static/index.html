@@ -69,10 +69,10 @@ a{color:inherit;text-decoration:none;}
 .filter-opts{display:flex;flex-direction:column;gap:6px;}
 .filter-opt{display:flex;align-items:center;gap:8px;font-size:.84rem;color:var(--text2);cursor:pointer;}
 .filter-opt input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:pointer;}
-.price-range{display:flex;gap:6px;align-items:center;}
-.price-range input{flex:1;padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r);font-size:.82rem;font-family:var(--font-display);color:var(--text);background:var(--surface2);}
+.price-range{display:flex;flex-direction:column;gap:6px;}
+.price-range input{width:100%;padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r);font-size:.82rem;font-family:var(--font-display);color:var(--text);background:var(--surface2);}
 .price-range input:focus{outline:none;border-color:var(--accent);}
-.price-range span{color:var(--muted);font-size:.8rem;}
+.price-range span{color:var(--muted);font-size:.75rem;text-align:center;}
 .filter-apply{width:100%;margin-top:4px;padding:8px;background:var(--accent);color:#fff;border:none;border-radius:var(--r);font-family:var(--font-display);font-size:.82rem;font-weight:700;cursor:pointer;transition:background .15s;}
 .filter-apply:hover{background:var(--accent-h);}
 
@@ -129,11 +129,11 @@ a{color:inherit;text-decoration:none;}
 
 /* ─── RIGHT PANEL ─── */
 .right-panel{display:flex;flex-direction:column;gap:16px;}
-.panel-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;}
+.panel-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:visible;}
 .panel-header{padding:14px 18px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:space-between;}
 .panel-title{font-weight:800;font-size:.9rem;letter-spacing:-.01em;display:flex;align-items:center;gap:8px;}
 .panel-badge{font-size:.65rem;font-weight:600;padding:2px 7px;border-radius:999px;background:rgba(255,255,255,.15);color:rgba(255,255,255,.8);letter-spacing:.04em;}
-.panel-body{padding:16px 18px;}
+.panel-body{padding:16px 18px;overflow-y:auto;max-height:calc(100vh - 200px);}
 
 /* selected item detail */
 .sel-empty{text-align:center;padding:28px 16px;color:var(--muted);}
@@ -395,7 +395,7 @@ a{color:inherit;text-decoration:none;}
     <div class="auth-body">
       <!-- SIGN IN -->
       <div class="tab-pane active" id="paneSignIn">
-        <div class="demo-hint">💡 Demo buyer: testuser1@gmail.com / password123 &nbsp;|&nbsp; Seller: seller1@gmail.com</div>
+        <div class="demo-hint">💡 Demo buyer: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c2b6a7b1b6b7b1a7b0f382a5afa3abaeeca1adaf">[email&#160;protected]</a> / password123 &nbsp;|&nbsp; Seller: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ccbfa9a0a0a9befd8caba1ada5a0e2afa3a1">[email&#160;protected]</a></div>
         <div class="auth-fields">
           <div class="auth-field"><label>Email</label><input id="siEmail" type="email" placeholder="you@example.com"/></div>
           <div class="auth-field"><label>Password</label><input id="siPass" type="password" placeholder="••••••••"/></div>
@@ -450,9 +450,14 @@ a{color:inherit;text-decoration:none;}
           <div class="filter-group">
             <span class="filter-label">Price Range</span>
             <div class="price-range">
-              <input id="fMinPrice" type="number" placeholder="Min $" min="0"/>
-              <span>—</span>
-              <input id="fMaxPrice" type="number" placeholder="Max $" min="0"/>
+              <div style="display:flex;gap:6px;align-items:center;">
+                <span style="font-size:.75rem;color:var(--muted);width:28px;">Min</span>
+                <input id="fMinPrice" type="number" placeholder="$ 0" min="0" style="flex:1;"/>
+              </div>
+              <div style="display:flex;gap:6px;align-items:center;">
+                <span style="font-size:.75rem;color:var(--muted);width:28px;">Max</span>
+                <input id="fMaxPrice" type="number" placeholder="$ ∞" min="0" style="flex:1;"/>
+              </div>
             </div>
           </div>
           <div class="filter-group">
@@ -620,7 +625,7 @@ a{color:inherit;text-decoration:none;}
   </div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 const API = '/api';
 const SK  = 'atlas_session_v2';
 let currentUser = null;
@@ -673,6 +678,24 @@ function itemEmoji(name){
   if(/watch/.test(n)) return '⌚';
   if(/tablet|ipad/.test(n)) return '📲';
   return '📦';
+}
+function itemImg(name){
+  const n=(name||'').toLowerCase();
+  // Picsum photos with consistent seeds per category — always-available placeholder images
+  if(/laptop|dell|xps/.test(n))       return 'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=400&q=80';
+  if(/macbook/.test(n))               return 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=400&q=80';
+  if(/iphone|smartphone/.test(n))     return 'https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=400&q=80';
+  if(/headphone|sony wh|bose|audio/.test(n)) return 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&q=80';
+  if(/samsung.*tv|qled|oled|lg c3/.test(n))  return 'https://images.unsplash.com/photo-1593784991095-a205069470b6?w=400&q=80';
+  if(/canon|camera|mirrorless/.test(n))return 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400&q=80';
+  if(/playstation|ps5/.test(n))       return 'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=400&q=80';
+  if(/apple watch|watch ultra/.test(n))return 'https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=400&q=80';
+  if(/nintendo|switch/.test(n))       return 'https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?w=400&q=80';
+  if(/ipad|tablet/.test(n))           return 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=400&q=80';
+  if(/phone|mobile/.test(n))          return 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&q=80';
+  if(/tv|television/.test(n))         return 'https://images.unsplash.com/photo-1593784991095-a205069470b6?w=400&q=80';
+  if(/laptop|computer/.test(n))       return 'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=400&q=80';
+  return 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400&q=80';
 }
 
 function getUser(){ return currentUser; }
@@ -857,9 +880,10 @@ function renderItems(items){
 function renderGridCard(i){
   const ep=parseEpoch(i.endTime), rem=remSec(ep), ended=isEnded(i), sel=currentSel?.auction_id==i.auctionId, hot=!ended&&rem<3600;
   return `<div class="item-card${sel?' selected':''}" onclick="setSelection(${i.auctionId})">
-    <div class="item-img"><span class="emoji">${itemEmoji(i.itemName)}</span>
-      <span class="item-badge ${ended?'badge-ended':'badge-live'}">${ended?'ENDED':'LIVE'}</span>
-      ${hot?'<span class="badge-hot">🔥 HOT</span>':''}
+    <div class="item-img" style="background:none;padding:0;overflow:hidden;">
+      <img src="${itemImg(i.itemName)}" alt="${i.itemName}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none';this.parentNode.innerHTML+='<span style=\"font-size:3rem;\">${itemEmoji(i.itemName)}</span>'"/>
+      <span class="item-badge ${ended?'badge-ended':'badge-live'}" style="position:absolute;top:10px;left:10px;">${ended?'ENDED':'LIVE'}</span>
+      ${hot?'<span class="badge-hot" style="position:absolute;top:10px;right:10px;">🔥 HOT</span>':''}
     </div>
     <div class="item-body">
       <div class="item-name">${esc(i.itemName)}</div>
@@ -877,7 +901,10 @@ function renderGridCard(i){
 function renderListCard(i){
   const ep=parseEpoch(i.endTime), rem=remSec(ep), ended=isEnded(i), sel=currentSel?.auction_id==i.auctionId;
   return `<div class="item-list-card${sel?' selected':''}" onclick="setSelection(${i.auctionId})">
-    <div class="item-list-img">${itemEmoji(i.itemName)}<span class="item-badge ${ended?'badge-ended':'badge-live'}" style="position:absolute;top:8px;left:8px;">${ended?'ENDED':'LIVE'}</span></div>
+    <div class="item-list-img" style="background:none;padding:0;overflow:hidden;">
+      <img src="${itemImg(i.itemName)}" alt="${i.itemName}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none';this.parentNode.innerHTML+='<span style=\"font-size:2.5rem;\">${itemEmoji(i.itemName)}</span>'"/>
+      <span class="item-badge ${ended?'badge-ended':'badge-live'}" style="position:absolute;top:8px;left:8px;z-index:1;">${ended?'ENDED':'LIVE'}</span>
+    </div>
     <div class="item-list-body">
       <div class="item-list-info">
         <div class="item-name" style="font-size:.95rem;margin-bottom:4px;">${esc(i.itemName)}</div>
@@ -910,7 +937,7 @@ async function restoreSel(){
   try{
     const d = await api('GET','/session/selection',null,true);
     if(!d?.auction_id){ currentSel=null; renderSelPanel(null); renderPayPanel(null); return; }
-    currentSel = d; renderSelPanel(d); renderPayPanel(d);
+    currentSel = d; renderSelPanel(d); renderPayPanelSafe(d);
   }catch(_){ currentSel=null; renderSelPanel(null); renderPayPanel(null); }
 }
 
@@ -919,7 +946,7 @@ function renderSelPanel(data){
   if(!data){ el.innerHTML=`<div class="sel-empty"><span class="icon">👆</span><p>Click any auction card to select it and start bidding</p></div>`; return; }
   const ep=parseEpoch(data.end_time), rem=remSec(ep), ended=isEnded(data), status=(data.status||'ACTIVE').toUpperCase();
   el.innerHTML = `
-    <div class="sel-item-img">${itemEmoji(data.item_name)}</div>
+    <div class="sel-item-img" style="background:none;padding:0;overflow:hidden;border-radius:var(--r);"><img src="${itemImg(data.item_name)}" alt="${data.item_name}" style="width:100%;height:100%;object-fit:cover;border-radius:var(--r);" onerror="this.style.display='none';this.parentNode.innerHTML='<span style=&quot;font-size:3rem;&quot;>${itemEmoji(data.item_name)}</span>'"/></div>
     <div class="sel-item-name">${esc(data.item_name||'Item')}</div>
     <div class="sel-item-desc">${esc(data.description||'')}</div>
     <div class="stat-grid">
@@ -932,13 +959,29 @@ function renderSelPanel(data){
       <div class="label">⏱ Time Remaining</div>
       <div class="time" id="selCd" data-end="${ep||''}">${ended?'AUCTION ENDED':fmtTimeMono(rem)}</div>
     </div>
+    ${!ended&&ep ? `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">
+      <div><div style="font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">⏰ Ends</div>
+      <div style="font-size:.82rem;color:var(--text);font-weight:600;margin-top:2px;">${new Date(ep*1000).toLocaleString([],{dateStyle:'medium',timeStyle:'short'})}</div></div>
+      <div style="font-size:.7rem;color:var(--muted);">Local time</div>
+    </div>` : ''}
     ${!ended?`<div class="bid-section"><div class="bid-label">🏷 Place Your Bid</div>
       <div class="bid-input-row">
-        <input id="bidAmount" type="number" step="1" min="${Math.floor(data.current_price)+1}" placeholder="$${Math.floor(data.current_price)+1}"/>
+        <input id="bidAmount" type="number" step="1" min="${Math.floor(data.current_price)+1}" placeholder="${Math.floor(data.current_price)+1}"/>
         <button onclick="placeBid()">Bid →</button>
       </div>
-      <div class="bid-hint">Minimum bid: $${Math.floor(data.current_price)+1} (must be an integer)</div>
+      <div class="bid-hint">Min: $${Math.floor(data.current_price)+1} · whole numbers only</div>
     </div>`:''}`;
+}
+
+// Safe version — skips re-rendering the form if user is actively filling it in
+function renderPayPanelSafe(data){
+  const pp = $id('payPanel');
+  // if payment panel is visible and user has started typing card details, don't wipe it
+  if(pp && pp.style.display !== 'none'){
+    const cardNum = $id('cardNumber');
+    if(cardNum && cardNum.value.trim().length > 0) return; // user is typing — leave it alone
+  }
+  renderPayPanel(data);
 }
 
 function renderPayPanel(data){
@@ -1150,7 +1193,18 @@ function sseConnect(userId, auctionId) {
     const isWinner=u&&String(p.winnerId)===String(u.userId||u.id);
     if(isWinner){
       pushNotif('ended','🏆 You won the auction!',`${p.itemName} — final price $${Number(p.finalPrice).toFixed(2)}. Pay now!`);
-      toast('success',`🏆 You won ${p.itemName}! Final price: $${Number(p.finalPrice).toFixed(2)}`);
+      // Big persistent toast for winner — stays for 10 seconds
+      toast('success',`🏆 You won ${p.itemName}! Final price $${Number(p.finalPrice).toFixed(2)} — scroll down to pay!`, 10000);
+      // Force-refresh selected panel and payment form immediately
+      if(currentSel&&currentSel.auction_id==p.auctionId){
+        restoreSel().then(()=>{
+          // Force re-render payment panel even if form is showing
+          if(currentSel) renderPayPanel(currentSel);
+        });
+      }
+    } else if(u && p.outbidUserId && String(p.outbidUserId)===String(u.userId||u.id)){
+      pushNotif('ended','😔 You did not win',`${p.itemName} — won by another bidder at $${Number(p.finalPrice).toFixed(2)}`);
+      toast('info',`Auction over: you did not win ${p.itemName}.`);
     } else {
       pushNotif('ended','🔔 Auction ended',`${p.itemName} closed at $${Number(p.finalPrice).toFixed(2)}`);
       toast('info',`Auction ended: ${p.itemName} ($${Number(p.finalPrice).toFixed(2)})`);
@@ -1212,8 +1266,7 @@ function renderNotifList(){
   const emojiMap={bid:'💰',ended:'🔔',created:'🆕',payment:'✅'};
   notifications.forEach(n=>{
     const el=document.createElement('div'); el.className='notif-item'+(n.unread?' unread':'');
-    el.innerHTML=`<div class="notif-icon ${iconMap[n.type]||'bid'}">${emojiMap[n.type]||'🔔'}</div>
-      <div class="notif-body"><div class="notif-title">${esc(n.title)}</div><div class="notif-msg">${esc(n.msg)}</div><div class="notif-time">${fmtNotifTime(n.ts)}</div></div>`;
+    el.innerHTML=`<div class="notif-icon ${iconMap[n.type]||'bid'}">${emojiMap[n.type]||'🔔'}</div><div class="notif-body"><div class="notif-title">${esc(n.title)}</div><div class="notif-msg">${esc(n.msg)}</div><div class="notif-time">${fmtNotifTime(n.ts)}</div></div>`;
     list.appendChild(el);
   });
 }
