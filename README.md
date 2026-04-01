@@ -1,4 +1,4 @@
-# EECS 4413 — Forward Auction E-Commerce System
+# EECS 4413: Forward Auction E-Commerce System
 **Team Atlas** 
 
 A full-stack forward auction system. Sellers list items with a starting price and duration. Buyers browse, select, and bid. The highest bidder at expiry wins and pays through a mock payment flow.
@@ -138,7 +138,7 @@ This creates `auction.db` with:
 
 ## Running the Application
 
-### Option A — Eclipse (recommended)
+### Option A: Eclipse (recommended)
 
 1. Open Eclipse → **File → Import → Existing Maven Projects**
 2. Select the `backend/` folder → click **Finish**
@@ -146,14 +146,14 @@ This creates `auction.db` with:
 4. In the **Project Explorer**, navigate to `com.yorku.auction`
 5. Right-click `AuctionSystemApplication.java` → **Run As → Java Application**
 
-### Option B — Maven CLI
+### Option B: Maven CLI
 
 ```bash
 cd backend
 mvn spring-boot:run
 ```
 
-### Option C — Build JAR and run
+### Option C: Build JAR and run
 
 ```bash
 cd backend
@@ -173,12 +173,12 @@ You should see this in the console:
 
 ## Running the Frontend
 
-No build step required — just open the HTML files directly in your browser.
+No build step required, just open the HTML files directly in your browser.
 
 1. Open `frontend/auth.html` to sign up or log in
 2. After authenticating, you'll be redirected to `frontend/index.html`
 
-> The frontend calls `http://localhost:8080` — make sure the backend is running first.
+> The frontend calls `http://localhost:8080`, make sure the backend is running first.
 
 ---
 
