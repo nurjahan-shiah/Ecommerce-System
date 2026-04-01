@@ -34,9 +34,13 @@ public class UserService implements UserDetailsService {
     public User register(SignupRequest request) {
         // Check if email already exists
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new RuntimeException("Email already in use");
         }
-        
+        // Check if username already exists
+        if (request.getUsername() != null && userRepository.existsByUsername(request.getUsername())) {
+            throw new RuntimeException("Username already taken");
+        }
+
         // Create new user
         User user = new User();
         user.setEmail(request.getEmail());
@@ -50,20 +54,20 @@ public class UserService implements UserDetailsService {
         user.setCity(request.getCity());
         user.setCountry(request.getCountry());
         user.setPostal_code(request.getPostal_code());
-        
+
         return userRepository.save(user);
     }
-    
+
     public User login(LoginRequest request) {
         // Find user by email
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Invalid email or password"));
-        
-//        // Check password (plaintext comparison for Deliverable 2)
-//        if (!user.getPassword().equals(request.getPassword())) {
-//            throw new RuntimeException("Invalid email or password");
-//        }
-        
+
+        // Verify password with BCrypt
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new RuntimeException("Invalid email or password");
+        }
+
         return user;
     }
     

@@ -6,19 +6,21 @@ set -e
 
 DB_PATH="/app/data/auction.db"
 
-echo "=== Auction System Docker Entrypoint ==="
+echo "=== Atlas Auction System Entrypoint ==="
 
-# Seed the DB only if it doesn't exist yet (first run)
-if [ ! -f "$DB_PATH" ]; then
-  echo "[INFO] No database found — creating and seeding $DB_PATH ..."
-  sqlite3 "$DB_PATH" < /app/schema.sql
-  sqlite3 "$DB_PATH" < /app/data.sql
-  echo "[INFO] Database initialised successfully."
-else
-  echo "[INFO] Existing database found at $DB_PATH — skipping seed."
-fi
+# Always re-apply schema (safe — all tables use CREATE IF NOT EXISTS)
+echo "[INFO] Applying schema to $DB_PATH ..."
+mkdir -p /app/data
+sqlite3 "$DB_PATH" < /app/schema.sql
 
-echo "[INFO] Starting Spring Boot application on port 8080 ..."
+# Always re-run data.sql so fresh auctions are seeded on every restart
+# The SQL uses DELETE+INSERT so old duplicates are cleared automatically
+echo "[INFO] Seeding data into $DB_PATH ..."
+sqlite3 "$DB_PATH" < /app/data.sql
+
+echo "[INFO] Database ready."
+echo "[INFO] Starting Spring Boot on port 8080 ..."
+
 exec java \
   -Dspring.datasource.url="jdbc:sqlite:$DB_PATH" \
   -jar /app/app.jar

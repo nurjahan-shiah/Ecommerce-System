@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Atlas Auction — Forward Auction Platform</title>
+<title>Atlas Auction</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@400;500;700;800;900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
@@ -239,7 +239,7 @@ a{color:inherit;text-decoration:none;}
 #aiToggle:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(26,39,68,.65);}
 .ai-ring{position:absolute;inset:-5px;border-radius:50%;border:2px solid rgba(212,160,23,.5);animation:aiRing 2.5s ease-out infinite;}
 @keyframes aiRing{0%{transform:scale(1);opacity:.7;}100%{transform:scale(1.5);opacity:0;}}
-#aiPanel{position:fixed;bottom:96px;right:28px;z-index:600;width:380px;max-height:560px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--shadow-lg);display:none;flex-direction:column;overflow:hidden;animation:panelIn .2s ease;}
+#aiPanel{position:fixed;bottom:96px;right:28px;z-index:600;width:420px;max-height:680px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--shadow-lg);display:none;flex-direction:column;overflow:hidden;animation:panelIn .2s ease;}
 #aiPanel.open{display:flex;}
 @keyframes panelIn{from{opacity:0;transform:translateY(12px) scale(.97);}to{opacity:1;transform:translateY(0) scale(1);}}
 .ai-panel-head{background:var(--navy);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;}
@@ -361,7 +361,6 @@ a{color:inherit;text-decoration:none;}
       <span id="userEmail"></span>
       <span style="color:rgba(255,255,255,.4);margin:0 4px;">·</span>
       <span id="userRole" style="color:var(--gold);font-weight:700;font-size:.75rem;"></span>
-      <!-- Notification bell in topbar -->
       <button id="notifBell" onclick="toggleNotifPanel()" title="Notifications" style="display:none;position:relative;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:var(--r);padding:5px 10px;color:#fff;cursor:pointer;margin-left:8px;font-size:1rem;line-height:1;transition:background .15s;">
         🔔
         <span id="notifBadge" style="position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;border-radius:999px;background:var(--accent);color:#fff;font-size:.62rem;font-weight:800;display:none;align-items:center;justify-content:center;padding:0 4px;border:2px solid var(--navy);">0</span>
@@ -402,7 +401,7 @@ a{color:inherit;text-decoration:none;}
       <!-- SIGN IN -->
       <div class="tab-pane active" id="paneSignIn">
         <div class="demo-hint" style="flex-direction:column;align-items:flex-start;gap:6px;">
-          <div style="font-weight:700;margin-bottom:2px;">💡 Test Accounts — all use password: <code style="background:rgba(0,0,0,.08);padding:1px 5px;border-radius:3px;">password123</code></div>
+          <div style="font-weight:700;margin-bottom:2px;">💡 Test Accounts: all use password: <code style="background:rgba(0,0,0,.08);padding:1px 5px;border-radius:3px;">password123</code></div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;font-size:.76rem;">
             <span>🛒 <b>Buyer 1:</b> testuser1@gmail.com</span>
             <span>🛒 <b>Buyer 2:</b> testuser2@gmail.com</span>
@@ -411,7 +410,7 @@ a{color:inherit;text-decoration:none;}
             <span>🏪 <b>Seller 1:</b> seller1@gmail.com</span>
             <span>🏪 <b>Seller 2:</b> seller2@gmail.com</span>
           </div>
-          <div style="font-size:.72rem;color:#7c5c1e;margin-top:2px;">🔒 Passwords stored as bcrypt hashes (not plaintext)</div>
+          <div style="font-size:.72rem;color:#7c5c1e;margin-top:2px;">🔒 Passwords stored as bcrypt hashes</div>
         </div>
         <div class="auth-fields">
           <div class="auth-field"><label>Email</label><input id="siEmail" type="email" placeholder="you@example.com"/></div>
@@ -547,7 +546,7 @@ a{color:inherit;text-decoration:none;}
       </div>
       <div class="panel-card" id="payPanel" style="display:none">
         <div class="pay-header">
-          <div class="pay-title">💳 Payment & Receipt</div>
+          <div class="pay-title">💳 Payment &amp; Receipt</div>
         </div>
         <div class="panel-body" id="payBody"></div>
       </div>
@@ -569,10 +568,11 @@ a{color:inherit;text-decoration:none;}
         <div class="form-field"><label>Description *</label><textarea id="description" style="height:80px;width:100%;padding:9px 12px;border:1.5px solid var(--border2);border-radius:var(--r);font-family:var(--font-display);font-size:.88rem;resize:vertical;outline:none;" placeholder="Describe the item…"></textarea></div>
         <div>
           <div class="form-field"><label>Keywords (comma-separated) *</label><input id="keywords" placeholder="laptop,dell,computer,electronics"/></div>
-          <div class="seller-grid" style="margin-top:10px;">
-            <div class="form-field"><label>Shipping ($)</label><input id="shippingPrice" type="number" min="0" placeholder="15"/></div>
-            <div class="form-field"><label>Expedited ($)</label><input id="expeditedPrice" type="number" min="0" placeholder="30"/></div>
-            <div class="form-field"><label>Ship Days</label><input id="shippingDays" type="number" min="1" placeholder="7"/></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+            <div class="form-field"><label>Standard Shipping ($)</label><input id="shippingPrice" type="number" min="0" placeholder="e.g. 15"/></div>
+            <div class="form-field"><label>Standard Ship Days <span style="font-weight:400;color:var(--muted)">(approx.)</span></label><input id="shippingDays" type="number" min="1" placeholder="e.g. 7"/></div>
+            <div class="form-field"><label>Expedited Shipping ($)</label><input id="expeditedPrice" type="number" min="0" placeholder="e.g. 30"/></div>
+            <div class="form-field"><label>Expedited Ship Days <span style="font-weight:400;color:var(--muted)">(approx.)</span></label><input id="expeditedDays" type="number" min="1" placeholder="e.g. 2"/></div>
           </div>
         </div>
       </div>
@@ -599,7 +599,6 @@ a{color:inherit;text-decoration:none;}
       <button class="notif-close" onclick="toggleNotifPanel()">✕</button>
     </div>
   </div>
-  <!-- SSE Status & Test Panel -->
   <div id="notifTestArea" style="padding:10px 14px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:.78rem;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
       <span style="font-weight:700;color:var(--text);">SSE Connection</span>
@@ -614,7 +613,7 @@ a{color:inherit;text-decoration:none;}
       <button onclick="recheckSse()" style="flex:1;padding:5px 8px;background:var(--green);color:#fff;border:none;border-radius:var(--r);font-size:.72rem;font-weight:700;cursor:pointer;">🔄 Reconnect</button>
     </div>
     <div style="margin-top:8px;color:var(--muted);font-size:.7rem;line-height:1.5;">
-      <strong>To verify real SSE:</strong> open a second browser tab, sign in as a different user, select the same auction and place a bid — this tab should receive a notification instantly.
+      <strong>To verify real SSE:</strong> open a second browser tab, sign in as a different user, select the same auction and place a bid, this tab should receive a notification instantly.
     </div>
   </div>
   <div id="notifList">
@@ -670,7 +669,7 @@ let unreadCount = 0;
 let notifications = [];
 let currentCatKeyword = '';
 let currentCatLabel   = 'All Auctions';
-let paymentFormActive = false;  // true while user has focus on any payment field
+let paymentFormActive = false;
 
 function $id(id){ return document.getElementById(id); }
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -730,6 +729,21 @@ function itemImg(name){
   if(/ipad|tablet/.test(n))           return 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=400&q=80';
   if(/phone|mobile|smartphone/.test(n))return 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=400&q=80';
   return 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400&q=80';
+}
+
+function imgFallback(imgEl, name){
+  imgEl.style.display = 'none';
+  var s = document.createElement('span');
+  s.style.fontSize = '3rem';
+  s.textContent = itemEmoji(name);
+  imgEl.parentNode.appendChild(s);
+}
+function imgFallbackSm(imgEl, name){
+  imgEl.style.display = 'none';
+  var s = document.createElement('span');
+  s.style.fontSize = '2.5rem';
+  s.textContent = itemEmoji(name);
+  imgEl.parentNode.appendChild(s);
 }
 
 function getUser(){ return currentUser; }
@@ -826,14 +840,12 @@ function showLoggedOut(){
 }
 
 async function loadCatalogue(keyword){
-  // If called without argument (e.g. from sync), use the currently active category
   if(keyword === undefined) keyword = currentCatKeyword;
   const showEnded = $id('fEnded')?.checked;
   try{
     const activePath = keyword ? `/catalogue/items?keyword=${encodeURIComponent(keyword)}` : '/catalogue/items/active';
     const activeItems = await api('GET', activePath);
     let allItems = activeItems || [];
-    // Also fetch ended/inactive if that filter is on
     if(showEnded){
       try{
         const inactivePath = keyword ? `/catalogue/items?keyword=${encodeURIComponent(keyword)}&status=inactive` : '/catalogue/items/inactive';
@@ -898,7 +910,7 @@ function clearFilters(){
   $id('fMinPrice').value = ''; $id('fMaxPrice').value = '';
   document.querySelector('input[name=fTime][value=""]').checked = true;
   $id('sortSelect').value = 'default';
-  loadCatalogue(); // reload since ended filter changed
+  loadCatalogue();
 }
 
 function setView(mode, el){
@@ -929,9 +941,11 @@ function renderItems(items){
 
 function renderGridCard(i){
   const ep=parseEpoch(i.endTime), rem=remSec(ep), ended=isEnded(i), sel=currentSel?.auction_id==i.auctionId, hot=!ended&&rem<3600;
+  // Use data-name attribute and a named fallback function to avoid quote-escaping issues in onerror
+  const safeName = esc(i.itemName).replace(/'/g, '&#39;');
   return `<div class="item-card${sel?' selected':''}" onclick="setSelection(${i.auctionId})">
     <div class="item-img" style="background:none;padding:0;overflow:hidden;">
-      <img src="${itemImg(i.itemName)}" alt="${i.itemName}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none';this.parentNode.innerHTML+='<span style=\"font-size:3rem;\">${itemEmoji(i.itemName)}</span>'"/>
+      <img src="${itemImg(i.itemName)}" alt="${safeName}" data-name="${safeName}" style="width:100%;height:100%;object-fit:cover;" onerror="imgFallback(this, this.dataset.name)"/>
       <span class="item-badge ${ended?'badge-ended':'badge-live'}" style="position:absolute;top:10px;left:10px;">${ended?'ENDED':'LIVE'}</span>
       ${hot?'<span class="badge-hot" style="position:absolute;top:10px;right:10px;">🔥 HOT</span>':''}
     </div>
@@ -950,9 +964,10 @@ function renderGridCard(i){
 
 function renderListCard(i){
   const ep=parseEpoch(i.endTime), rem=remSec(ep), ended=isEnded(i), sel=currentSel?.auction_id==i.auctionId;
+  const safeName = esc(i.itemName).replace(/'/g, '&#39;');
   return `<div class="item-list-card${sel?' selected':''}" onclick="setSelection(${i.auctionId})">
     <div class="item-list-img" style="background:none;padding:0;overflow:hidden;">
-      <img src="${itemImg(i.itemName)}" alt="${i.itemName}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none';this.parentNode.innerHTML+='<span style=\"font-size:2.5rem;\">${itemEmoji(i.itemName)}</span>'"/>
+      <img src="${itemImg(i.itemName)}" alt="${safeName}" data-name="${safeName}" style="width:100%;height:100%;object-fit:cover;" onerror="imgFallbackSm(this, this.dataset.name)"/>
       <span class="item-badge ${ended?'badge-ended':'badge-live'}" style="position:absolute;top:8px;left:8px;z-index:1;">${ended?'ENDED':'LIVE'}</span>
     </div>
     <div class="item-list-body">
@@ -991,18 +1006,15 @@ async function restoreSel(){
   }catch(_){ currentSel=null; renderSelPanel(null); renderPayPanel(null); }
 }
 
-// Safe version — if the user is typing a bid amount, only update the live data parts
 function renderSelPanelSafe(data){
   const bidInput = $id('bidAmount');
   const userTypingBid = bidInput && (document.activeElement === bidInput || bidInput.value.trim().length > 0);
   if(userTypingBid){
-    // Just update the price/status boxes and countdown without rebuilding the whole panel
     const ep=parseEpoch(data.end_time), rem=remSec(ep), ended=isEnded(data), status=(data.status||'ACTIVE').toUpperCase();
     const priceEl = document.querySelector('#selBody .stat-val.price');
     const statusEl = document.querySelector('#selBody .stat-val.green, #selBody .stat-val.red');
     if(priceEl) priceEl.textContent = '$'+money(data.current_price);
     if(statusEl){ statusEl.textContent=status; statusEl.className='stat-val '+(status==='ACTIVE'?'green':'red'); }
-    // Update min on the input in case price changed
     const minBid = Math.floor(data.current_price)+1;
     bidInput.min = minBid;
     const hint = bidInput.closest('.bid-section')?.querySelector('.bid-hint');
@@ -1016,8 +1028,11 @@ function renderSelPanel(data){
   const el = $id('selBody');
   if(!data){ el.innerHTML=`<div class="sel-empty"><span class="icon">👆</span><p>Click any auction card to select it and start bidding</p></div>`; return; }
   const ep=parseEpoch(data.end_time), rem=remSec(ep), ended=isEnded(data), status=(data.status||'ACTIVE').toUpperCase();
+  const safeName = (data.item_name||'').replace(/'/g,"\\'");
   el.innerHTML = `
-    <div class="sel-item-img" style="background:none;padding:0;overflow:hidden;border-radius:var(--r);"><img src="${itemImg(data.item_name)}" alt="${data.item_name}" style="width:100%;height:100%;object-fit:cover;border-radius:var(--r);" onerror="this.style.display='none';this.parentNode.innerHTML='<span style=&quot;font-size:3rem;&quot;>${itemEmoji(data.item_name)}</span>'"/></div>
+    <div class="sel-item-img" style="background:none;padding:0;overflow:hidden;border-radius:var(--r);">
+      <img src="${itemImg(data.item_name)}" alt="${esc(data.item_name)}" data-name="${esc(data.item_name).replace(/'/g,'&#39;')}" style="width:100%;height:100%;object-fit:cover;border-radius:var(--r);" onerror="imgFallback(this, this.dataset.name)"/>
+    </div>
     <div class="sel-item-name">${esc(data.item_name||'Item')}</div>
     <div class="sel-item-desc">${esc(data.description||'')}</div>
     <div class="stat-grid">
@@ -1044,11 +1059,9 @@ function renderSelPanel(data){
     </div>`:''}`;
 }
 
-// Safe version — skips re-rendering the form if user is actively filling it in
 function renderPayPanelSafe(data){
   const pp = $id('payPanel');
   if(pp && pp.style.display !== 'none'){
-    // Block re-render if user has focus on a payment field OR has typed anything
     if(paymentFormActive) return;
     const fields = ['cardNumber','cardName','expiryDate','securityCode'];
     const userTyping = fields.some(id => { const el=$id(id); return el && el.value.trim().length > 0; });
@@ -1063,11 +1076,9 @@ function renderPayPanel(data){
   pp.style.display='block';
   const u=getUser(), ended=isEnded(data), isSeller=(u?.role||'').toUpperCase()==='SELLER';
   const isWinner=Number(data.highest_bidder_id)===Number(u?.userId);
-  // Use string comparison for seller_id to handle integer vs string from backend
   const isMySale = isSeller && String(data.seller_id) === String(u?.userId);
   const completed=(data.status||'').toUpperCase()==='COMPLETED', body=$id('payBody');
 
-  // ── SELLER VIEW ────────────────────────────────────────────────────────────
   if(isMySale){
     const winnerLabel = data.highest_bidder_id ? `User #${data.highest_bidder_id}` : null;
     if(completed){
@@ -1099,16 +1110,13 @@ function renderPayPanel(data){
     return;
   }
 
-  // ── BUYER VIEW ─────────────────────────────────────────────────────────────
   if(completed && isWinner){ fetchAndRenderReceipt(data, body); return; }
   if(completed){ body.innerHTML=`<div class="warn-msg ok">✓ Payment already completed for this auction.</div>`; return; }
   if(!ended){ body.innerHTML=`<div class="warn-msg info">⏳ Auction still active. Payment becomes available once it ends.</div>`; return; }
   if(!isWinner){ body.innerHTML=`<div class="warn-msg err">✕ You did not win this auction. The winner was User #${data.highest_bidder_id||'unknown'}.</div>`; return; }
 
-  // Winner payment form
   const ship=Number(data.shipping_price||0);
   const expShip=Number(data.exp_shipping_price||0);
-  // Expedited costs more but ships faster — ensure expShip > ship
   const expShipFinal = expShip > ship ? expShip : Math.round(ship * 1.8);
   const stdDays = data.shipping_days || 7;
   const expDays = Math.max(1, Math.floor(stdDays / 3));
@@ -1124,6 +1132,19 @@ function renderPayPanel(data){
         <option value="false">Standard  $${money(ship)}  (arrives in ${stdDays} days)</option>
         <option value="true">Expedited  $${money(expShipFinal)}  (arrives in ${expDays} days)</option>
       </select>
+    </div>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:12px;">
+      <div style="font-size:.74rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">📍 Shipping Address</div>
+      <div class="form-field" style="margin-bottom:8px;"><label>Full Name</label><input id="shipFullName" placeholder="e.g. John Smith"/></div>
+      <div class="form-field" style="margin-bottom:8px;"><label>Street Address</label><input id="shipStreet" placeholder="e.g. 123 Main St"/></div>
+      <div class="form-row" style="margin-bottom:8px;">
+        <div class="form-field" style="margin-bottom:0;"><label>City</label><input id="shipCity" placeholder="e.g. Toronto"/></div>
+        <div class="form-field" style="margin-bottom:0;"><label>Province / State</label><input id="shipProvince" placeholder="e.g. ON"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-field" style="margin-bottom:0;"><label>Postal / ZIP Code</label><input id="shipPostal" placeholder="e.g. M5V 2T6"/></div>
+        <div class="form-field" style="margin-bottom:0;"><label>Country</label><input id="shipCountry" placeholder="e.g. Canada"/></div>
+      </div>
     </div>
     <div class="card-preview">
       <div class="card-chip"></div>
@@ -1145,17 +1166,15 @@ function renderPayPanel(data){
       <div class="form-field"></div>
     </div>
     <button class="pay-btn" onclick="submitPayment()">🔒 Pay $<span id="payBtnAmt">${money(Number(data.current_price)+ship)}</span> Securely</button>`;
-  // Attach focus/blur listeners so we know when user is actively typing payment details
   paymentFormActive = false;
   setTimeout(() => {
-    ['cardNumber','cardName','expiryDate','securityCode'].forEach(fid => {
+    ['cardNumber','cardName','expiryDate','securityCode','shipFullName','shipStreet','shipCity','shipProvince','shipPostal','shipCountry'].forEach(fid => {
       const el = $id(fid);
       if(el){
         el.addEventListener('focus', () => { paymentFormActive = true; });
         el.addEventListener('blur',  () => {
-          // Small delay so tabbing between fields doesn't briefly clear the flag
           setTimeout(() => {
-            const anyFocused = ['cardNumber','cardName','expiryDate','securityCode']
+            const anyFocused = ['cardNumber','cardName','expiryDate','securityCode','shipFullName','shipStreet','shipCity','shipProvince','shipPostal','shipCountry']
               .some(id => document.activeElement === $id(id));
             if(!anyFocused) paymentFormActive = false;
           }, 200);
@@ -1195,33 +1214,54 @@ async function submitPayment(){
   const cardNum=$id('cardNumber')?.value.replace(/\s/g,''), cardName=$id('cardName')?.value.trim();
   const expiry=$id('expiryDate')?.value.trim(), cvv=$id('securityCode')?.value.trim();
   const exp=$id('expedited')?.value==='true';
+  // Collect shipping address exactly as typed
+  const shipFullName=$id('shipFullName')?.value.trim();
+  const shipStreet=$id('shipStreet')?.value.trim();
+  const shipCity=$id('shipCity')?.value.trim();
+  const shipProvince=$id('shipProvince')?.value.trim();
+  const shipPostal=$id('shipPostal')?.value.trim();
+  const shipCountry=$id('shipCountry')?.value.trim();
+  if(!shipFullName||!shipStreet||!shipCity||!shipPostal||!shipCountry){ toast('error','Please fill in all shipping address fields'); return; }
   if(!cardNum||!cardName||!expiry||!cvv){ toast('error','All payment fields are required'); return; }
   if(cardNum.length<13||cardNum.length>16){ toast('error','Enter a valid card number'); return; }
   if(!/^\d{2}\/\d{2}$/.test(expiry)){ toast('error','Expiry must be MM/YY format'); return; }
   if(cvv.length<3){ toast('error','Enter a valid CVV'); return; }
+  // Build the address string exactly as the user wrote it
+  const addressLines = [shipStreet, [shipCity, shipProvince].filter(Boolean).join(', '), [shipPostal, shipCountry].filter(Boolean).join(', ')].filter(Boolean);
+  const userAddress = addressLines.join('\n');
+  // Persist address so it shows correctly on the receipt even after page refresh
+  const auctionKey = 'atlas_addr_' + currentSel.auction_id;
+  localStorage.setItem(auctionKey, JSON.stringify({ recipientName: shipFullName, shippingAddress: userAddress }));
   try{
     const d=await api('POST','/payments/pay',{auctionId:Number(currentSel.auction_id),expeditedShipping:exp,cardNumber:cardNum,cardName,expiryDate:expiry,securityCode:cvv},true,true);
+    // Inject user-entered address & name into receipt data
+    d.recipientName = shipFullName;
+    d.shippingAddress = userAddress;
     renderReceipt(d); toast('success','Payment successful! Your receipt is ready.');
     await restoreSel(); applyFilters();
   }catch(e){ toast('error', e.message); }
 }
 
-// UC6: Display receipt for a COMPLETED auction the user won
 async function fetchAndRenderReceipt(data, body){
   const u = getUser();
-  // Try fetching from backend first; fall back to data we have locally
+  // Read user-entered address from localStorage (saved at payment time)
+  const savedAddr = (() => { try{ return JSON.parse(localStorage.getItem('atlas_addr_' + data.auction_id)||'null'); }catch(_){return null;} })();
+  const savedName = savedAddr?.recipientName || [u?.first_name, u?.last_name].filter(Boolean).join(' ') || u?.email || 'N/A';
+  const savedAddress = savedAddr?.shippingAddress || [u?.street_number, u?.street_name, u?.city, u?.country, u?.postal_code].filter(Boolean).join(', ') || 'N/A';
   try{
     const d = await api('GET', `/payments/receipt/${data.auction_id}`, null, true, true);
+    // Always overlay with what the user typed — backend may not store it
+    d.recipientName = savedName;
+    d.shippingAddress = savedAddress;
     renderReceiptInto(body, d);
   } catch(_){
-    // Backend may not expose GET /receipt — build from session data
     const ship = Number(data.shipping_price||0);
     const total = Number(data.current_price) + ship;
     renderReceiptInto(body, {
       paymentId: data.auction_id,
       itemName: data.item_name,
-      recipientName: [u?.first_name, u?.last_name].filter(Boolean).join(' ') || u?.email || 'N/A',
-      shippingAddress: [u?.street_number, u?.street_name, u?.city, u?.country, u?.postal_code].filter(Boolean).join(', ') || 'N/A',
+      recipientName: savedName,
+      shippingAddress: savedAddress,
       winningBid: data.current_price,
       shippingCost: ship,
       totalAmount: total,
@@ -1232,14 +1272,11 @@ async function fetchAndRenderReceipt(data, body){
   }
 }
 
-// ── MOCK SHIPMENT TRACKING ─────────────────────────────────────────────────
-// Generates deterministic fake tracking steps based on auctionId + shippingDays
 function mockTrackSteps(auctionId, shippingDays, isSeller){
   const seed = Number(auctionId) || 1;
   const carriers = ['FedEx','UPS','Canada Post','DHL'];
   const carrier = carriers[seed % carriers.length];
   const trackNum = 'ATL' + String(seed * 7 + 10000).padStart(6,'0') + String(seed % 9 + 1);
-  // Simulate progress: completed auction = paid = label created; roughly 1/3 through shipping
   const steps = [
     { label:'Order Confirmed',   icon:'✅', done:true,  detail:'Payment received and verified' },
     { label:'Label Created',     icon:'🏷',  done:true,  detail:`${carrier} label printed. Tracking: ${trackNum}` },
@@ -1287,7 +1324,7 @@ function renderReceiptInto(container, d){
       <div class="receipt-body">
         <div class="receipt-line"><span class="rk">Item</span><span>${esc(d.itemName||'')}</span></div>
         <div class="receipt-line"><span class="rk">Recipient</span><span>${esc(d.recipientName||'N/A')}</span></div>
-        <div class="receipt-line"><span class="rk">Ship to</span><span>${esc(d.shippingAddress||'N/A')}</span></div>
+        <div class="receipt-line" style="align-items:flex-start;"><span class="rk">Ship to</span><span style="text-align:right;white-space:pre-line;">${esc(d.shippingAddress||'N/A')}</span></div>
         <div class="receipt-line"><span class="rk">Winning Bid</span><span>$${money(d.winningBid||d.totalAmount)}</span></div>
         <div class="receipt-line"><span class="rk">Shipping (${shipLabel})</span><span>$${money(d.shippingCost||0)}</span></div>
         <div class="receipt-line"><span class="rk">Total Paid</span><span>$${money(d.totalAmount)}</span></div>
@@ -1310,17 +1347,18 @@ async function uploadAuctionItem(){
   const keywords=$id('keywords').value.trim(), startingPrice=Number($id('startingPrice').value);
   const durationMinutes=Number($id('durationMinutes').value), shippingPrice=Number($id('shippingPrice').value)||0;
   const expeditedShippingPrice=Number($id('expeditedPrice').value)||0, shippingDays=Number($id('shippingDays').value)||7;
+  const expeditedDays=Number($id('expeditedDays').value)||Math.max(1,Math.floor(shippingDays/3));
   if(!itemName){ toast('error','Item name is required'); return; }
   if(!description){ toast('error','Description is required'); return; }
   if(!keywords){ toast('error','Keywords are required'); return; }
   if(!startingPrice||startingPrice<=0||!Number.isInteger(startingPrice)){ toast('error','Starting price must be a positive integer'); return; }
   if(!durationMinutes||durationMinutes<=0||!Number.isInteger(durationMinutes)){ toast('error','Duration must be a positive integer (minutes)'); return; }
   try{
-    const d=await api('POST','/seller/auctions',{itemName,description,startingPrice,durationMinutes,keywords,shippingPrice,expeditedShippingPrice,shippingDays},false,true);
+    const d=await api('POST','/seller/auctions',{itemName,description,startingPrice,durationMinutes,keywords,shippingPrice,expeditedShippingPrice,shippingDays,expeditedDays},false,true);
     $id('sellerMsg').innerHTML=`<span style="color:var(--green)">✓ Listed! Auction #${d.auctionId} · Item #${d.itemId} · Starting $${money(d.startingPrice)}</span>`;
     toast('success','Item listed successfully!');
     ['itemName','description','keywords'].forEach(id=>{ const e=$id(id); if(e)e.value=''; });
-    ['startingPrice','durationMinutes','shippingPrice','expeditedPrice','shippingDays'].forEach(id=>{ const e=$id(id); if(e)e.value=''; });
+    ['startingPrice','durationMinutes','shippingPrice','expeditedPrice','shippingDays','expeditedDays'].forEach(id=>{ const e=$id(id); if(e)e.value=''; });
     await loadCatalogue();
   }catch(e){ toast('error', e.message); }
 }
@@ -1363,7 +1401,8 @@ function buildAIContext(){
   const u=getUser(), activeItems=catCache.filter(i=>!isEnded(i));
   const itemSummary=activeItems.slice(0,10).map(i=>`- "${i.itemName}" (Auction #${i.auctionId}): current bid $${money(i.currentPrice)}, ${fmtTime(remSec(parseEpoch(i.endTime)))} remaining, ships $${money(i.shippingPrice)}`).join('\n');
   const selInfo=currentSel?`Currently selected: Auction #${currentSel.auction_id} "${currentSel.item_name}", price $${money(currentSel.current_price)}, status: ${currentSel.status}`:'No auction currently selected.';
-  return [`User: ${u?u.email+' (Role: '+u.role+')':'Not logged in'}`,selInfo,`Active auctions (${activeItems.length} total):`,itemSummary||'None right now.'].join('\n');
+  const instruction='You are Atlas AI, a concise assistant for an online auction platform. Match the length of your response to the question — short casual messages get short replies (1-2 sentences), detailed questions get full answers. Never pad or over-explain. Be direct and friendly.';
+  return [instruction,`User: ${u?u.email+' (Role: '+u.role+')':'Not logged in'}`,selInfo,`Active auctions (${activeItems.length} total):`,itemSummary||'None right now.'].join('\n');
 }
 async function sendAI(){
   const inp=$id('aiInput'), msg=inp.value.trim(); if(!msg) return;
@@ -1391,7 +1430,6 @@ function sseConnect(userId, auctionId) {
   const url = auctionId
     ? `/api/notifications/subscribe?userId=${userId}&auctionId=${auctionId}`
     : `/api/notifications/subscribe?userId=${userId}`;
-  // Show the URL in the test panel
   const urlDisplay = $id('sseUrlDisplay');
   if(urlDisplay) urlDisplay.textContent = url;
   sseConn = new EventSource(url);
@@ -1415,7 +1453,6 @@ function sseConnect(userId, auctionId) {
     const isSeller=(u?.role||'').toUpperCase()==='SELLER';
     const isMyItem=isSeller && p.sellerId && String(p.sellerId)===String(u.userId||u.id);
     if(isMyItem){
-      // Seller notification: item sold
       if(p.winnerId){
         pushNotif('ended','🎉 Your item sold!',`${p.itemName} sold for $${Number(p.finalPrice).toFixed(2)}. Prepare it for shipment once buyer pays.`);
         toast('success',`🎉 Your item "${p.itemName}" sold for $${Number(p.finalPrice).toFixed(2)}!`, 8000);
@@ -1487,7 +1524,6 @@ function setSseDot(live){
   }
 }
 
-// ─── NOTIFICATION TEST HELPERS ─────────────────────────────────────────────
 function testNotifBid(){
   const item = currentSel?.item_name || 'Sony WH-1000XM5';
   const price = (currentSel?.current_price || 350) + 10;
@@ -1507,7 +1543,6 @@ function recheckSse(){
   toast('info','SSE reconnecting…');
 }
 
-// ─── NOTIFICATION PANEL ───────────────────────────────────────────────────────
 function toggleNotifPanel(){
   notifOpen=!notifOpen; $id('notifPanel').classList.toggle('open',notifOpen);
   if(notifOpen){ notifications.forEach(n=>n.unread=false); unreadCount=0; updateBadge(); renderNotifList(); }
@@ -1532,7 +1567,6 @@ function bellShake(){
   const bell=$id('notifBell');
   if(!bell) return;
   bell.style.animation='none';
-  // Force reflow then apply shake
   void bell.offsetWidth;
   bell.style.animation='bellShakeTop .5s ease';
   setTimeout(()=>{ bell.style.animation=''; }, 600);

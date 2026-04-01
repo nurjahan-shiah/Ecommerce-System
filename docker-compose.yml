@@ -13,7 +13,7 @@ services:
       - auction-db:/app/data
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - GEMINI_API_KEY=AIzaSyAbUuBLNcMsltPM_glaKMtfGqKBUIr-cw4
+      - GEMINI_API_KEY=AIzaSyBwIUSn1qP0HgwEGXABRCqZ8LyBA30CNo4
       - SPRING_APPLICATION_JSON={"gemini.api.key":""}
     restart: unless-stopped
     healthcheck:
