@@ -155,10 +155,10 @@ a{color:inherit;text-decoration:none;}
 .countdown-big.ending{background:linear-gradient(135deg,#7f1d1d,#991b1b);}
 .bid-section{background:var(--accent-light);border:1px solid rgba(200,68,26,.2);border-radius:var(--r);padding:14px;margin-bottom:12px;}
 .bid-section .bid-label{font-size:.75rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
-.bid-input-row{display:flex;gap:8px;}
-.bid-input-row input{flex:1;padding:10px 12px;border:1.5px solid rgba(200,68,26,.3);border-radius:var(--r);font-family:var(--font-mono);font-size:1.1rem;font-weight:600;color:var(--accent);background:#fff;outline:none;}
+.bid-input-row{display:flex;flex-direction:column;gap:8px;}
+.bid-input-row input{width:100%;padding:10px 12px;border:1.5px solid rgba(200,68,26,.3);border-radius:var(--r);font-family:var(--font-mono);font-size:1.1rem;font-weight:600;color:var(--accent);background:#fff;outline:none;box-sizing:border-box;}
 .bid-input-row input:focus{border-color:var(--accent);}
-.bid-input-row button{padding:10px 18px;background:var(--accent);color:#fff;border:none;border-radius:var(--r);font-family:var(--font-display);font-weight:700;font-size:.88rem;cursor:pointer;transition:background .15s;white-space:nowrap;}
+.bid-input-row button{width:100%;padding:11px 18px;background:var(--accent);color:#fff;border:none;border-radius:var(--r);font-family:var(--font-display);font-weight:700;font-size:.92rem;cursor:pointer;transition:background .15s;}
 .bid-input-row button:hover{background:var(--accent-h);}
 .bid-hint{font-size:.75rem;color:var(--muted);margin-top:6px;}
 
@@ -639,6 +639,9 @@ let sseConn     = null;
 let notifOpen   = false;
 let unreadCount = 0;
 let notifications = [];
+let currentCatKeyword = '';
+let currentCatLabel   = 'All Auctions';
+let paymentFormActive = false;  // true while user has focus on any payment field
 
 function $id(id){ return document.getElementById(id); }
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -791,7 +794,9 @@ function showLoggedOut(){
   $id('userChip').style.display  = 'none';
 }
 
-async function loadCatalogue(keyword=''){
+async function loadCatalogue(keyword){
+  // If called without argument (e.g. from sync), use the currently active category
+  if(keyword === undefined) keyword = currentCatKeyword;
   try{
     const path = keyword ? `/catalogue/items?keyword=${encodeURIComponent(keyword)}` : '/catalogue/items/active';
     const items = await api('GET', path);
@@ -803,15 +808,19 @@ async function loadCatalogue(keyword=''){
 
 function searchCatalogue(){
   const kw = ($id('searchInput').value.trim()) || ($id('searchCat').value);
+  currentCatKeyword = kw;
+  currentCatLabel = kw ? `Results for "${kw}"` : 'All Auctions';
+  $id('catalogueTitle').textContent = currentCatLabel;
   loadCatalogue(kw);
-  if(kw) $id('catalogueTitle').textContent = `Results for "${kw}"`;
 }
 
 function filterCat(el, kw){
   document.querySelectorAll('.cat-pill').forEach(p=>p.classList.remove('active'));
   el.classList.add('active');
   $id('searchInput').value = kw;
-  $id('catalogueTitle').textContent = kw ? el.textContent.trim() : 'All Auctions';
+  currentCatKeyword = kw;
+  currentCatLabel = kw ? el.textContent.trim() : 'All Auctions';
+  $id('catalogueTitle').textContent = currentCatLabel;
   loadCatalogue(kw);
 }
 
@@ -937,8 +946,29 @@ async function restoreSel(){
   try{
     const d = await api('GET','/session/selection',null,true);
     if(!d?.auction_id){ currentSel=null; renderSelPanel(null); renderPayPanel(null); return; }
-    currentSel = d; renderSelPanel(d); renderPayPanelSafe(d);
+    currentSel = d; renderSelPanelSafe(d); renderPayPanelSafe(d);
   }catch(_){ currentSel=null; renderSelPanel(null); renderPayPanel(null); }
+}
+
+// Safe version — if the user is typing a bid amount, only update the live data parts
+function renderSelPanelSafe(data){
+  const bidInput = $id('bidAmount');
+  const userTypingBid = bidInput && (document.activeElement === bidInput || bidInput.value.trim().length > 0);
+  if(userTypingBid){
+    // Just update the price/status boxes and countdown without rebuilding the whole panel
+    const ep=parseEpoch(data.end_time), rem=remSec(ep), ended=isEnded(data), status=(data.status||'ACTIVE').toUpperCase();
+    const priceEl = document.querySelector('#selBody .stat-val.price');
+    const statusEl = document.querySelector('#selBody .stat-val.green, #selBody .stat-val.red');
+    if(priceEl) priceEl.textContent = '$'+money(data.current_price);
+    if(statusEl){ statusEl.textContent=status; statusEl.className='stat-val '+(status==='ACTIVE'?'green':'red'); }
+    // Update min on the input in case price changed
+    const minBid = Math.floor(data.current_price)+1;
+    bidInput.min = minBid;
+    const hint = bidInput.closest('.bid-section')?.querySelector('.bid-hint');
+    if(hint) hint.textContent = `Min: $${minBid} · whole numbers only`;
+    return;
+  }
+  renderSelPanel(data);
 }
 
 function renderSelPanel(data){
@@ -976,10 +1006,12 @@ function renderSelPanel(data){
 // Safe version — skips re-rendering the form if user is actively filling it in
 function renderPayPanelSafe(data){
   const pp = $id('payPanel');
-  // if payment panel is visible and user has started typing card details, don't wipe it
   if(pp && pp.style.display !== 'none'){
-    const cardNum = $id('cardNumber');
-    if(cardNum && cardNum.value.trim().length > 0) return; // user is typing — leave it alone
+    // Block re-render if user has focus on a payment field OR has typed anything
+    if(paymentFormActive) return;
+    const fields = ['cardNumber','cardName','expiryDate','securityCode'];
+    const userTyping = fields.some(id => { const el=$id(id); return el && el.value.trim().length > 0; });
+    if(userTyping) return;
   }
   renderPayPanel(data);
 }
@@ -1027,6 +1059,24 @@ function renderPayPanel(data){
       <div class="form-field"></div>
     </div>
     <button class="pay-btn" onclick="submitPayment()">🔒 Pay $<span id="payBtnAmt">${money(Number(data.current_price)+Number(ship))}</span> Securely</button>`;
+  // Attach focus/blur listeners so we know when user is actively typing payment details
+  paymentFormActive = false;
+  setTimeout(() => {
+    ['cardNumber','cardName','expiryDate','securityCode'].forEach(fid => {
+      const el = $id(fid);
+      if(el){
+        el.addEventListener('focus', () => { paymentFormActive = true; });
+        el.addEventListener('blur',  () => {
+          // Small delay so tabbing between fields doesn't briefly clear the flag
+          setTimeout(() => {
+            const anyFocused = ['cardNumber','cardName','expiryDate','securityCode']
+              .some(id => document.activeElement === $id(id));
+            if(!anyFocused) paymentFormActive = false;
+          }, 200);
+        });
+      }
+    });
+  }, 50);
 }
 
 function fmtCard(inp){ let v=inp.value.replace(/\D/g,'').slice(0,16); inp.value=v.replace(/(\d{4})(?=\d)/g,'$1 '); }

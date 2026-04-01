@@ -1,3 +1,16 @@
+-- ─── CLEANUP STALE DATA (removes duplicates from old restarts) ───────────────
+-- Wipe auctions and catalogue items so fresh inserts below are clean.
+-- Users, bids, and payments are preserved across restarts.
+DELETE FROM session_selection;
+DELETE FROM auctions WHERE status = 'ACTIVE';
+DELETE FROM catalogue_items WHERE item_name IN (
+  'Laptop Dell XPS 15','iPhone 15 Pro','Sony WH-1000XM5',
+  'Samsung 65" QLED TV','Canon EOS R6 Mark II','PlayStation 5',
+  'Apple Watch Ultra 2','MacBook Air M3','Bose QuietComfort 45',
+  'LG C3 OLED 55"','Nintendo Switch OLED','iPad Pro M4 13"',
+  'Test Winner Laptop','Test Complete iPhone'
+);
+
 -- ─── USERS ───────────────────────────────────────────────────────────────────
 INSERT OR IGNORE INTO users (username, password, role, email, first_name, last_name, street_number, street_name, city, country, postal_code)
 VALUES
@@ -27,42 +40,43 @@ INSERT OR IGNORE INTO catalogue_items (item_name, description, starting_price, s
 
 -- ─── ACTIVE AUCTIONS ─────────────────────────────────────────────────────────
 -- Each item_id is looked up by name so restarts never break the references
+-- NOTE: End times are staggered for testing — from 1 minute to 3 hours
 INSERT OR IGNORE INTO auctions (item_id, seller_id, auction_type, end_time, current_price, status) VALUES
   ((SELECT item_id FROM catalogue_items WHERE item_name='Laptop Dell XPS 15'),
-   (SELECT user_id FROM users WHERE username='seller1'), 'FORWARD', datetime('now','+30 days'), 1200.00, 'ACTIVE'),
+   (SELECT user_id FROM users WHERE username='seller1'), 'FORWARD', datetime('now','+1 minute'),   1200.00, 'ACTIVE'),
 
   ((SELECT item_id FROM catalogue_items WHERE item_name='iPhone 15 Pro'),
-   (SELECT user_id FROM users WHERE username='seller1'), 'FORWARD', datetime('now','+7 days'),   999.00, 'ACTIVE'),
+   (SELECT user_id FROM users WHERE username='seller1'), 'FORWARD', datetime('now','+4 minutes'),   999.00, 'ACTIVE'),
 
   ((SELECT item_id FROM catalogue_items WHERE item_name='Sony WH-1000XM5'),
-   (SELECT user_id FROM users WHERE username='seller1'), 'FORWARD', datetime('now','+3 days'),   350.00, 'ACTIVE'),
+   (SELECT user_id FROM users WHERE username='seller1'), 'FORWARD', datetime('now','+8 minutes'),   350.00, 'ACTIVE'),
 
   ((SELECT item_id FROM catalogue_items WHERE item_name='Samsung 65" QLED TV'),
-   (SELECT user_id FROM users WHERE username='seller1'), 'FORWARD', datetime('now','+14 days'), 1500.00, 'ACTIVE'),
+   (SELECT user_id FROM users WHERE username='seller1'), 'FORWARD', datetime('now','+15 minutes'), 1500.00, 'ACTIVE'),
 
   ((SELECT item_id FROM catalogue_items WHERE item_name='Canon EOS R6 Mark II'),
-   (SELECT user_id FROM users WHERE username='seller1'), 'FORWARD', datetime('now','+10 days'), 2500.00, 'ACTIVE'),
+   (SELECT user_id FROM users WHERE username='seller1'), 'FORWARD', datetime('now','+22 minutes'), 2500.00, 'ACTIVE'),
 
   ((SELECT item_id FROM catalogue_items WHERE item_name='PlayStation 5'),
-   (SELECT user_id FROM users WHERE username='seller1'), 'FORWARD', datetime('now','+5 days'),   499.00, 'ACTIVE'),
+   (SELECT user_id FROM users WHERE username='seller1'), 'FORWARD', datetime('now','+30 minutes'),  499.00, 'ACTIVE'),
 
   ((SELECT item_id FROM catalogue_items WHERE item_name='Apple Watch Ultra 2'),
-   (SELECT user_id FROM users WHERE username='seller1'), 'FORWARD', datetime('now','+8 days'),   799.00, 'ACTIVE'),
+   (SELECT user_id FROM users WHERE username='seller1'), 'FORWARD', datetime('now','+45 minutes'),  799.00, 'ACTIVE'),
 
   ((SELECT item_id FROM catalogue_items WHERE item_name='MacBook Air M3'),
-   (SELECT user_id FROM users WHERE username='seller1'), 'FORWARD', datetime('now','+21 days'), 1299.00, 'ACTIVE'),
+   (SELECT user_id FROM users WHERE username='seller1'), 'FORWARD', datetime('now','+60 minutes'), 1299.00, 'ACTIVE'),
 
   ((SELECT item_id FROM catalogue_items WHERE item_name='Bose QuietComfort 45'),
-   (SELECT user_id FROM users WHERE username='seller1'), 'FORWARD', datetime('now','+6 days'),   279.00, 'ACTIVE'),
+   (SELECT user_id FROM users WHERE username='seller1'), 'FORWARD', datetime('now','+75 minutes'),  279.00, 'ACTIVE'),
 
   ((SELECT item_id FROM catalogue_items WHERE item_name='LG C3 OLED 55"'),
-   (SELECT user_id FROM users WHERE username='seller1'), 'FORWARD', datetime('now','+12 days'), 1200.00, 'ACTIVE'),
+   (SELECT user_id FROM users WHERE username='seller1'), 'FORWARD', datetime('now','+90 minutes'), 1200.00, 'ACTIVE'),
 
   ((SELECT item_id FROM catalogue_items WHERE item_name='Nintendo Switch OLED'),
-   (SELECT user_id FROM users WHERE username='seller1'), 'FORWARD', datetime('now','+4 days'),   349.00, 'ACTIVE'),
+   (SELECT user_id FROM users WHERE username='seller1'), 'FORWARD', datetime('now','+2 hours'),    349.00, 'ACTIVE'),
 
   ((SELECT item_id FROM catalogue_items WHERE item_name='iPad Pro M4 13"'),
-   (SELECT user_id FROM users WHERE username='seller1'), 'FORWARD', datetime('now','+9 days'),  1099.00, 'ACTIVE');
+   (SELECT user_id FROM users WHERE username='seller1'), 'FORWARD', datetime('now','+3 hours'),   1099.00, 'ACTIVE');
 
 -- ─── ENDED AUCTION (testuser4 is winner) ─────────────────────────────────────
 INSERT OR IGNORE INTO auctions (item_id, seller_id, auction_type, end_time, current_price, status, highest_bidder_id) VALUES
