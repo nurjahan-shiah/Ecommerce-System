@@ -275,14 +275,12 @@ a{color:inherit;text-decoration:none;}
 #aiSend:hover{background:var(--navy2);}
 
 /* ─── NOTIFICATION BELL ─── */
-#notifBell{position:fixed;bottom:96px;right:28px;z-index:599;width:46px;height:46px;border-radius:50%;background:var(--surface);border:1.5px solid var(--border);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:var(--shadow);transition:transform .2s,box-shadow .2s;}
-#notifBell:hover{transform:scale(1.08);box-shadow:var(--shadow-lg);}
-#notifBadge{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;border-radius:999px;background:var(--accent);color:#fff;font-size:.65rem;font-weight:800;display:none;align-items:center;justify-content:center;padding:0 4px;border:2px solid var(--surface);}
-#notifBadge.show{display:flex;}
-@keyframes bellShake{0%,100%{transform:rotate(0);}20%{transform:rotate(-18deg);}40%{transform:rotate(16deg);}60%{transform:rotate(-10deg);}80%{transform:rotate(8deg);}}
-#notifBell.ring{animation:bellShake .5s ease;}
-#notifPanel{position:fixed;bottom:154px;right:28px;z-index:599;width:360px;max-height:480px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--shadow-lg);display:none;flex-direction:column;overflow:hidden;animation:panelIn .2s ease;}
+#notifBell:hover{background:rgba(255,255,255,.2) !important;}
+#notifBadge{display:none;}
+#notifBadge.show{display:flex !important;}
+#notifPanel{position:fixed;top:70px;right:16px;z-index:599;width:380px;max-height:520px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--shadow-lg);display:none;flex-direction:column;overflow:hidden;animation:panelIn .2s ease;}
 #notifPanel.open{display:flex;}
+@keyframes bellShakeTop{0%,100%{transform:rotate(0);}20%{transform:rotate(-15deg);}40%{transform:rotate(14deg);}60%{transform:rotate(-8deg);}80%{transform:rotate(6deg);}}
 .notif-head{background:var(--navy);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;}
 .notif-head-title{color:#fff;font-weight:800;font-size:.88rem;display:flex;align-items:center;gap:8px;}
 .notif-head-actions{display:flex;align-items:center;gap:6px;}
@@ -345,9 +343,12 @@ a{color:inherit;text-decoration:none;}
       <select id="searchCat" title="Category">
         <option value="">All Categories</option>
         <option value="laptop">Laptops</option>
-        <option value="phone">Phones</option>
-        <option value="audio">Audio</option>
-        <option value="electronics">Electronics</option>
+        <option value="smartphone">Phones</option>
+        <option value="headphones">Audio</option>
+        <option value="tv">TVs</option>
+        <option value="camera">Cameras</option>
+        <option value="gaming">Gaming</option>
+        <option value="smartwatch">Watches</option>
       </select>
       <button onclick="searchCatalogue()">Search</button>
     </div>
@@ -360,8 +361,13 @@ a{color:inherit;text-decoration:none;}
       <span id="userEmail"></span>
       <span style="color:rgba(255,255,255,.4);margin:0 4px;">·</span>
       <span id="userRole" style="color:var(--gold);font-weight:700;font-size:.75rem;"></span>
+      <!-- Notification bell in topbar -->
+      <button id="notifBell" onclick="toggleNotifPanel()" title="Notifications" style="display:none;position:relative;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:var(--r);padding:5px 10px;color:#fff;cursor:pointer;margin-left:8px;font-size:1rem;line-height:1;transition:background .15s;">
+        🔔
+        <span id="notifBadge" style="position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;border-radius:999px;background:var(--accent);color:#fff;font-size:.62rem;font-weight:800;display:none;align-items:center;justify-content:center;padding:0 4px;border:2px solid var(--navy);">0</span>
+      </button>
       <button class="tb-btn" style="margin-left:8px;padding:4px 10px;font-size:.75rem;" onclick="logout()">Sign Out</button>
-      <span title="Live notifications" style="display:flex;align-items:center;gap:4px;font-size:.7rem;color:rgba(255,255,255,.5);margin-left:4px;">
+      <span title="Live connection status" style="display:flex;align-items:center;gap:4px;font-size:.7rem;color:rgba(255,255,255,.5);margin-left:4px;">
         <span class="notif-sse-dot" id="sseDot"></span><span id="sseLabel">offline</span>
       </span>
     </div>
@@ -371,12 +377,12 @@ a{color:inherit;text-decoration:none;}
   <div class="cat-nav-inner">
     <button class="cat-pill active" onclick="filterCat(this,'')">All Items</button>
     <button class="cat-pill" onclick="filterCat(this,'laptop')">💻 Laptops</button>
-    <button class="cat-pill" onclick="filterCat(this,'phone')">📱 Phones</button>
-    <button class="cat-pill" onclick="filterCat(this,'audio')">🎧 Audio</button>
+    <button class="cat-pill" onclick="filterCat(this,'smartphone')">📱 Phones</button>
+    <button class="cat-pill" onclick="filterCat(this,'headphones')">🎧 Audio</button>
     <button class="cat-pill" onclick="filterCat(this,'tv')">📺 TVs</button>
     <button class="cat-pill" onclick="filterCat(this,'camera')">📷 Cameras</button>
     <button class="cat-pill" onclick="filterCat(this,'gaming')">🎮 Gaming</button>
-    <button class="cat-pill" onclick="filterCat(this,'watch')">⌚ Watches</button>
+    <button class="cat-pill" onclick="filterCat(this,'smartwatch')">⌚ Watches</button>
     <button class="cat-pill" onclick="filterCat(this,'furniture')">🪑 Furniture</button>
   </div>
 </div>
@@ -386,7 +392,7 @@ a{color:inherit;text-decoration:none;}
   <div class="auth-modal">
     <div class="auth-top">
       <div class="auth-logo">Atlas<span> Auction</span></div>
-      <div class="auth-sub">Forward auction platform — bid, win, collect.</div>
+      <div class="auth-sub">Forward auction platform. Bid, win, collect.</div>
     </div>
     <div class="auth-tabs">
       <button class="auth-tab active" id="tabSignIn" onclick="switchAuthTab('signin')">Sign In</button>
@@ -395,7 +401,18 @@ a{color:inherit;text-decoration:none;}
     <div class="auth-body">
       <!-- SIGN IN -->
       <div class="tab-pane active" id="paneSignIn">
-        <div class="demo-hint">💡 Demo buyer: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c2b6a7b1b6b7b1a7b0f382a5afa3abaeeca1adaf">[email&#160;protected]</a> / password123 &nbsp;|&nbsp; Seller: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ccbfa9a0a0a9befd8caba1ada5a0e2afa3a1">[email&#160;protected]</a></div>
+        <div class="demo-hint" style="flex-direction:column;align-items:flex-start;gap:6px;">
+          <div style="font-weight:700;margin-bottom:2px;">💡 Test Accounts — all use password: <code style="background:rgba(0,0,0,.08);padding:1px 5px;border-radius:3px;">password123</code></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;font-size:.76rem;">
+            <span>🛒 <b>Buyer 1:</b> testuser1@gmail.com</span>
+            <span>🛒 <b>Buyer 2:</b> testuser2@gmail.com</span>
+            <span>🛒 <b>Buyer 3:</b> testuser3@gmail.com</span>
+            <span>🛒 <b>Winner:</b> testuser4@gmail.com</span>
+            <span>🏪 <b>Seller 1:</b> seller1@gmail.com</span>
+            <span>🏪 <b>Seller 2:</b> seller2@gmail.com</span>
+          </div>
+          <div style="font-size:.72rem;color:#7c5c1e;margin-top:2px;">🔒 Passwords stored as bcrypt hashes (not plaintext)</div>
+        </div>
         <div class="auth-fields">
           <div class="auth-field"><label>Email</label><input id="siEmail" type="email" placeholder="you@example.com"/></div>
           <div class="auth-field"><label>Password</label><input id="siPass" type="password" placeholder="••••••••"/></div>
@@ -443,8 +460,8 @@ a{color:inherit;text-decoration:none;}
           <div class="filter-group">
             <span class="filter-label">Status</span>
             <div class="filter-opts">
-              <label class="filter-opt"><input type="checkbox" id="fActive" checked onchange="applyFilters()"/> Active Auctions</label>
-              <label class="filter-opt"><input type="checkbox" id="fEnded" onchange="applyFilters()"/> Ended Auctions</label>
+              <label class="filter-opt"><input type="checkbox" id="fActive" checked onchange="loadCatalogue()"/> Active Auctions</label>
+              <label class="filter-opt"><input type="checkbox" id="fEnded" onchange="loadCatalogue()"/> Ended Auctions</label>
             </div>
           </div>
           <div class="filter-group">
@@ -519,7 +536,7 @@ a{color:inherit;text-decoration:none;}
     <aside class="right-panel">
       <div class="panel-card" id="selPanel">
         <div class="panel-header">
-          <div class="panel-title">📦 Selected Item <span class="panel-badge">UC3</span></div>
+          <div class="panel-title">📦 Selected Item</div>
         </div>
         <div class="panel-body" id="selBody">
           <div class="sel-empty">
@@ -530,7 +547,7 @@ a{color:inherit;text-decoration:none;}
       </div>
       <div class="panel-card" id="payPanel" style="display:none">
         <div class="pay-header">
-          <div class="pay-title">💳 Payment <span class="panel-badge" style="background:rgba(255,255,255,.2);color:#fff;">UC4 · UC5</span></div>
+          <div class="pay-title">💳 Payment & Receipt</div>
         </div>
         <div class="panel-body" id="payBody"></div>
       </div>
@@ -540,7 +557,7 @@ a{color:inherit;text-decoration:none;}
   <!-- SELLER SECTION -->
   <div class="seller-panel" id="sellerPanel" style="display:none">
     <div class="seller-header">
-      <div class="seller-title">🏪 Seller Dashboard — List a New Item <span class="panel-badge" style="background:rgba(255,255,255,.15);color:rgba(255,255,255,.8);padding:2px 8px;border-radius:999px;font-size:.7rem;margin-left:10px;">UC7</span></div>
+      <div class="seller-title">🏪 Seller Dashboard</div>
     </div>
     <div class="seller-body">
       <div class="seller-grid" style="margin-bottom:12px;">
@@ -570,12 +587,6 @@ a{color:inherit;text-decoration:none;}
 <!-- TOAST -->
 <div id="toast"></div>
 
-<!-- NOTIFICATION BELL -->
-<button id="notifBell" onclick="toggleNotifPanel()" title="Notifications" style="display:none">
-  🔔
-  <span id="notifBadge">0</span>
-</button>
-
 <!-- NOTIFICATION PANEL -->
 <div id="notifPanel">
   <div class="notif-head">
@@ -586,6 +597,24 @@ a{color:inherit;text-decoration:none;}
     <div class="notif-head-actions">
       <button class="notif-clear" onclick="clearNotifications()">Clear all</button>
       <button class="notif-close" onclick="toggleNotifPanel()">✕</button>
+    </div>
+  </div>
+  <!-- SSE Status & Test Panel -->
+  <div id="notifTestArea" style="padding:10px 14px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:.78rem;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+      <span style="font-weight:700;color:var(--text);">SSE Connection</span>
+      <span id="sseStatusBadge" style="padding:2px 8px;border-radius:999px;font-size:.7rem;font-weight:700;background:#fee2e2;color:#b91c1c;">Offline</span>
+    </div>
+    <div style="color:var(--muted);margin-bottom:8px;line-height:1.5;">
+      Stream URL: <code id="sseUrlDisplay" style="font-size:.7rem;color:var(--navy);word-break:break-all;">—</code>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      <button onclick="testNotifBid()" style="flex:1;padding:5px 8px;background:var(--navy);color:#fff;border:none;border-radius:var(--r);font-size:.72rem;font-weight:700;cursor:pointer;">🧪 Fake Bid</button>
+      <button onclick="testNotifEnd()" style="flex:1;padding:5px 8px;background:var(--accent);color:#fff;border:none;border-radius:var(--r);font-size:.72rem;font-weight:700;cursor:pointer;">🏁 Fake End</button>
+      <button onclick="recheckSse()" style="flex:1;padding:5px 8px;background:var(--green);color:#fff;border:none;border-radius:var(--r);font-size:.72rem;font-weight:700;cursor:pointer;">🔄 Reconnect</button>
+    </div>
+    <div style="margin-top:8px;color:var(--muted);font-size:.7rem;line-height:1.5;">
+      <strong>To verify real SSE:</strong> open a second browser tab, sign in as a different user, select the same auction and place a bid — this tab should receive a notification instantly.
     </div>
   </div>
   <div id="notifList">
@@ -604,7 +633,7 @@ a{color:inherit;text-decoration:none;}
   <div class="ai-panel-head">
     <div class="ai-panel-title">
       🤖 Atlas AI Assistant
-      <span class="panel-badge" style="background:rgba(212,160,23,.2);color:var(--gold);">UC8</span>
+      <span class="panel-badge" style="background:rgba(212,160,23,.2);color:var(--gold);">AI</span>
     </div>
     <div style="display:flex;align-items:center;gap:12px;">
       <div class="ai-status"><div class="ai-dot"></div>Online</div>
@@ -684,20 +713,22 @@ function itemEmoji(name){
 }
 function itemImg(name){
   const n=(name||'').toLowerCase();
-  // Picsum photos with consistent seeds per category — always-available placeholder images
-  if(/laptop|dell|xps/.test(n))       return 'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=400&q=80';
   if(/macbook/.test(n))               return 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=400&q=80';
-  if(/iphone|smartphone/.test(n))     return 'https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=400&q=80';
+  if(/dell|xps/.test(n))              return 'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=400&q=80';
+  if(/laptop|computer/.test(n))       return 'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=400&q=80';
+  if(/iphone/.test(n))                return 'https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=400&q=80';
+  if(/galaxy|s24/.test(n))            return 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=400&q=80';
+  if(/pixel/.test(n))                 return 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=400&q=80';
+  if(/oneplus/.test(n))               return 'https://images.unsplash.com/photo-1605236453806-6ff36851218e?w=400&q=80';
   if(/headphone|sony wh|bose|audio/.test(n)) return 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&q=80';
   if(/samsung.*tv|qled|oled|lg c3/.test(n))  return 'https://images.unsplash.com/photo-1593784991095-a205069470b6?w=400&q=80';
+  if(/tv|television/.test(n))         return 'https://images.unsplash.com/photo-1593784991095-a205069470b6?w=400&q=80';
   if(/canon|camera|mirrorless/.test(n))return 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400&q=80';
   if(/playstation|ps5/.test(n))       return 'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=400&q=80';
   if(/apple watch|watch ultra/.test(n))return 'https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=400&q=80';
   if(/nintendo|switch/.test(n))       return 'https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?w=400&q=80';
   if(/ipad|tablet/.test(n))           return 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=400&q=80';
-  if(/phone|mobile/.test(n))          return 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&q=80';
-  if(/tv|television/.test(n))         return 'https://images.unsplash.com/photo-1593784991095-a205069470b6?w=400&q=80';
-  if(/laptop|computer/.test(n))       return 'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=400&q=80';
+  if(/phone|mobile|smartphone/.test(n))return 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=400&q=80';
   return 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400&q=80';
 }
 
@@ -785,7 +816,7 @@ function showLoggedIn(u){
   $id('userRole').textContent     = u.role || '';
   $id('userAvatar').textContent   = (u.email||u.username||'U')[0].toUpperCase();
   if((u.role||'').toUpperCase() === 'SELLER') $id('sellerPanel').style.display = 'block';
-  $id('notifBell').style.display = 'flex';
+  $id('notifBell').style.display = 'inline-flex';
   sseConnect(u.userId || u.id);
 }
 function showLoggedOut(){
@@ -797,10 +828,20 @@ function showLoggedOut(){
 async function loadCatalogue(keyword){
   // If called without argument (e.g. from sync), use the currently active category
   if(keyword === undefined) keyword = currentCatKeyword;
+  const showEnded = $id('fEnded')?.checked;
   try{
-    const path = keyword ? `/catalogue/items?keyword=${encodeURIComponent(keyword)}` : '/catalogue/items/active';
-    const items = await api('GET', path);
-    catCache = items || [];
+    const activePath = keyword ? `/catalogue/items?keyword=${encodeURIComponent(keyword)}` : '/catalogue/items/active';
+    const activeItems = await api('GET', activePath);
+    let allItems = activeItems || [];
+    // Also fetch ended/inactive if that filter is on
+    if(showEnded){
+      try{
+        const inactivePath = keyword ? `/catalogue/items?keyword=${encodeURIComponent(keyword)}&status=inactive` : '/catalogue/items/inactive';
+        const inactiveItems = await api('GET', inactivePath);
+        allItems = allItems.concat(inactiveItems || []);
+      }catch(_){}
+    }
+    catCache = allItems;
     applyFilters();
     updateStats();
   }catch(e){ toast('error','Could not load catalogue'); }
@@ -857,7 +898,7 @@ function clearFilters(){
   $id('fMinPrice').value = ''; $id('fMaxPrice').value = '';
   document.querySelector('input[name=fTime][value=""]').checked = true;
   $id('sortSelect').value = 'default';
-  applyFilters();
+  loadCatalogue(); // reload since ended filter changed
 }
 
 function setView(mode, el){
@@ -1020,23 +1061,68 @@ function renderPayPanel(data){
   const pp = $id('payPanel');
   if(!data){ pp.style.display='none'; return; }
   pp.style.display='block';
-  const u=getUser(), ended=isEnded(data), isWinner=Number(data.highest_bidder_id)===Number(u?.userId);
+  const u=getUser(), ended=isEnded(data), isSeller=(u?.role||'').toUpperCase()==='SELLER';
+  const isWinner=Number(data.highest_bidder_id)===Number(u?.userId);
+  // Use string comparison for seller_id to handle integer vs string from backend
+  const isMySale = isSeller && String(data.seller_id) === String(u?.userId);
   const completed=(data.status||'').toUpperCase()==='COMPLETED', body=$id('payBody');
+
+  // ── SELLER VIEW ────────────────────────────────────────────────────────────
+  if(isMySale){
+    const winnerLabel = data.highest_bidder_id ? `User #${data.highest_bidder_id}` : null;
+    if(completed){
+      const trackSteps = mockTrackSteps(data.auction_id, data.shipping_days||7, true);
+      body.innerHTML=`
+        <div class="warn-msg ok" style="margin-bottom:10px;">✅ Sold for <strong>$${money(data.current_price)}</strong> to ${winnerLabel||'a buyer'}. Payment received.</div>
+        <div style="font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">📦 Shipment Status</div>
+        ${renderTrackingSteps(trackSteps)}
+        <div class="warn-msg info" style="margin-top:10px;">Ship to the buyer's registered address within 2 business days.</div>`;
+      return;
+    }
+    if(ended && winnerLabel){
+      body.innerHTML=`
+        <div class="warn-msg ok" style="margin-bottom:10px;">🏷 Auction closed. Winning bid <strong>$${money(data.current_price)}</strong> by ${winnerLabel}.</div>
+        <div class="warn-msg info">⏳ Waiting for buyer payment. Once confirmed you will be notified to ship.</div>`;
+      return;
+    }
+    if(ended){
+      body.innerHTML=`<div class="warn-msg warn">📭 Auction ended with no bids. Consider relisting the item.</div>`;
+      return;
+    }
+    body.innerHTML=`
+      <div class="warn-msg info" style="margin-bottom:8px;">🔴 Your auction is live.</div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:12px;">
+        <div style="display:flex;justify-content:space-between;font-size:.84rem;padding:4px 0;"><span style="color:var(--muted);">Current bid</span><span style="font-weight:700;color:var(--accent);font-family:var(--font-mono);">$${money(data.current_price)}</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:.84rem;padding:4px 0;"><span style="color:var(--muted);">Top bidder</span><span style="font-weight:700;">${data.highest_bidder_id ? 'User #'+data.highest_bidder_id : 'No bids yet'}</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:.84rem;padding:4px 0;"><span style="color:var(--muted);">Standard ship</span><span>$${money(data.shipping_price||0)} · ${data.shipping_days||7} days</span></div>
+      </div>`;
+    return;
+  }
+
+  // ── BUYER VIEW ─────────────────────────────────────────────────────────────
+  if(completed && isWinner){ fetchAndRenderReceipt(data, body); return; }
   if(completed){ body.innerHTML=`<div class="warn-msg ok">✓ Payment already completed for this auction.</div>`; return; }
   if(!ended){ body.innerHTML=`<div class="warn-msg info">⏳ Auction still active. Payment becomes available once it ends.</div>`; return; }
   if(!isWinner){ body.innerHTML=`<div class="warn-msg err">✕ You did not win this auction. The winner was User #${data.highest_bidder_id||'unknown'}.</div>`; return; }
-  const ship=data.shipping_price||0, expShip=data.exp_shipping_price||0;
+
+  // Winner payment form
+  const ship=Number(data.shipping_price||0);
+  const expShip=Number(data.exp_shipping_price||0);
+  // Expedited costs more but ships faster — ensure expShip > ship
+  const expShipFinal = expShip > ship ? expShip : Math.round(ship * 1.8);
+  const stdDays = data.shipping_days || 7;
+  const expDays = Math.max(1, Math.floor(stdDays / 3));
   body.innerHTML=`
     <div class="pay-winner-banner">🏆 Congratulations! You won with a bid of <strong>$${money(data.current_price)}</strong></div>
     <div class="order-summary" id="orderSummary">
       <div class="order-row"><span class="ok">Winning bid</span><span>$${money(data.current_price)}</span></div>
       <div class="order-row"><span class="ok">Shipping</span><span id="shipCost">$${money(ship)}</span></div>
-      <div class="order-row"><span class="ok">Total</span><span id="orderTotal">$${money(Number(data.current_price)+Number(ship))}</span></div>
+      <div class="order-row"><span class="ok">Total</span><span id="orderTotal">$${money(Number(data.current_price)+ship)}</span></div>
     </div>
     <div class="form-field"><label>Shipping Method</label>
-      <select id="expedited" onchange="updateOrderTotal(${data.current_price},${ship},${expShip})">
-        <option value="false">Standard — $${money(ship)} (~${data.shipping_days||7} days)</option>
-        <option value="true">Expedited — $${money(expShip)} (~3 days)</option>
+      <select id="expedited" onchange="updateOrderTotal(${data.current_price},${ship},${expShipFinal})">
+        <option value="false">Standard  $${money(ship)}  (arrives in ${stdDays} days)</option>
+        <option value="true">Expedited  $${money(expShipFinal)}  (arrives in ${expDays} days)</option>
       </select>
     </div>
     <div class="card-preview">
@@ -1058,7 +1144,7 @@ function renderPayPanel(data){
       <div class="form-field"><label>CVV</label><input id="securityCode" placeholder="123" maxlength="4" type="password"/></div>
       <div class="form-field"></div>
     </div>
-    <button class="pay-btn" onclick="submitPayment()">🔒 Pay $<span id="payBtnAmt">${money(Number(data.current_price)+Number(ship))}</span> Securely</button>`;
+    <button class="pay-btn" onclick="submitPayment()">🔒 Pay $<span id="payBtnAmt">${money(Number(data.current_price)+ship)}</span> Securely</button>`;
   // Attach focus/blur listeners so we know when user is actively typing payment details
   paymentFormActive = false;
   setTimeout(() => {
@@ -1094,7 +1180,7 @@ async function placeBid(){
   if(!val){ toast('error','Enter a bid amount'); return; }
   const bidAmount=Number(val);
   if(!Number.isInteger(bidAmount)||bidAmount<=0){ toast('error','Bid must be a positive whole number'); return; }
-  if(String(val).includes('.')){ toast('error','Bids must be integers — no decimals'); return; }
+  if(String(val).includes('.')){ toast('error','Bids must be whole numbers only'); return; }
   try{
     const d=await api('POST','/bids',{bidAmount},true,true);
     toast('success',`Bid $${money(d.newPrice)} accepted! You're the top bidder.`);
@@ -1120,20 +1206,102 @@ async function submitPayment(){
   }catch(e){ toast('error', e.message); }
 }
 
-function renderReceipt(d){
-  $id('payBody').innerHTML=`
+// UC6: Display receipt for a COMPLETED auction the user won
+async function fetchAndRenderReceipt(data, body){
+  const u = getUser();
+  // Try fetching from backend first; fall back to data we have locally
+  try{
+    const d = await api('GET', `/payments/receipt/${data.auction_id}`, null, true, true);
+    renderReceiptInto(body, d);
+  } catch(_){
+    // Backend may not expose GET /receipt — build from session data
+    const ship = Number(data.shipping_price||0);
+    const total = Number(data.current_price) + ship;
+    renderReceiptInto(body, {
+      paymentId: data.auction_id,
+      itemName: data.item_name,
+      recipientName: [u?.first_name, u?.last_name].filter(Boolean).join(' ') || u?.email || 'N/A',
+      shippingAddress: [u?.street_number, u?.street_name, u?.city, u?.country, u?.postal_code].filter(Boolean).join(', ') || 'N/A',
+      winningBid: data.current_price,
+      shippingCost: ship,
+      totalAmount: total,
+      shippingDays: data.shipping_days || 7,
+      paymentDate: data.end_time || '',
+      expedited: false
+    });
+  }
+}
+
+// ── MOCK SHIPMENT TRACKING ─────────────────────────────────────────────────
+// Generates deterministic fake tracking steps based on auctionId + shippingDays
+function mockTrackSteps(auctionId, shippingDays, isSeller){
+  const seed = Number(auctionId) || 1;
+  const carriers = ['FedEx','UPS','Canada Post','DHL'];
+  const carrier = carriers[seed % carriers.length];
+  const trackNum = 'ATL' + String(seed * 7 + 10000).padStart(6,'0') + String(seed % 9 + 1);
+  // Simulate progress: completed auction = paid = label created; roughly 1/3 through shipping
+  const steps = [
+    { label:'Order Confirmed',   icon:'✅', done:true,  detail:'Payment received and verified' },
+    { label:'Label Created',     icon:'🏷',  done:true,  detail:`${carrier} label printed. Tracking: ${trackNum}` },
+    { label:'Picked Up',         icon:'📦', done:isSeller, detail: isSeller ? 'Package handed to carrier' : 'Awaiting seller pickup' },
+    { label:'In Transit',        icon:'🚚', done:false, detail:`En route via ${carrier}` },
+    { label:'Out for Delivery',  icon:'🛵', done:false, detail:'With delivery driver' },
+    { label:'Delivered',         icon:'🎉', done:false, detail:`Estimated in ${shippingDays} business days` },
+  ];
+  return { steps, carrier, trackNum };
+}
+
+function renderTrackingSteps({ steps, carrier, trackNum }){
+  const html = steps.map((s,i) => {
+    const isActive = !s.done && (i === 0 || steps[i-1]?.done);
+    const cls = s.done ? 'color:var(--green)' : isActive ? 'color:var(--accent)' : 'color:var(--muted2)';
+    const bg  = s.done ? 'var(--green-light)' : isActive ? 'var(--accent-light)' : 'var(--surface2)';
+    const border = s.done ? '#86efac' : isActive ? 'rgba(200,68,26,.25)' : 'var(--border)';
+    return `<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;">
+      <div style="width:32px;height:32px;border-radius:50%;background:${bg};border:1.5px solid ${border};display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;">${s.icon}</div>
+      <div style="flex:1;padding-top:4px;">
+        <div style="font-size:.82rem;font-weight:700;${cls};">${s.label}${s.done?' ✓':isActive?' (Current)':''}</div>
+        <div style="font-size:.74rem;color:var(--muted);margin-top:1px;">${s.detail}</div>
+      </div>
+    </div>`;
+  }).join('');
+  return `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:8px;">
+    <div style="font-size:.72rem;color:var(--muted);margin-bottom:10px;">Carrier: <strong>${carrier}</strong> · Tracking: <code style="font-size:.72rem;">${trackNum}</code></div>
+    ${html}
+  </div>`;
+}
+
+function renderReceiptInto(container, d){
+  const paidDate = d.paymentDate ? new Date(d.paymentDate).toLocaleDateString([], {dateStyle:'medium'}) : new Date().toLocaleDateString();
+  const shipLabel = d.expedited ? 'Expedited' : 'Standard';
+  const shippingDays = d.shippingDays || 7;
+  const auctionId = d.auctionId || d.paymentId || 1;
+  const trackData = mockTrackSteps(auctionId, shippingDays, false);
+  container.innerHTML=`
     <div class="receipt-card">
-      <div class="receipt-top"><div class="check">✅</div><h3>Payment Successful</h3><p>Order #${d.paymentId||'—'} · ${new Date().toLocaleDateString()}</p></div>
+      <div class="receipt-top">
+        <div class="check">✅</div>
+        <h3>Payment Confirmed</h3>
+        <p>Order #${d.paymentId||'N/A'} · ${paidDate}</p>
+      </div>
       <div class="receipt-body">
         <div class="receipt-line"><span class="rk">Item</span><span>${esc(d.itemName||'')}</span></div>
-        <div class="receipt-line"><span class="rk">Winner</span><span>${esc(d.recipientName||('User #'+(d.winnerId||'')))}</span></div>
-        <div class="receipt-line"><span class="rk">Ship to</span><span>${esc(d.shippingAddress||'—')}</span></div>
+        <div class="receipt-line"><span class="rk">Recipient</span><span>${esc(d.recipientName||'N/A')}</span></div>
+        <div class="receipt-line"><span class="rk">Ship to</span><span>${esc(d.shippingAddress||'N/A')}</span></div>
         <div class="receipt-line"><span class="rk">Winning Bid</span><span>$${money(d.winningBid||d.totalAmount)}</span></div>
-        <div class="receipt-line"><span class="rk">Shipping</span><span>$${money(d.shippingCost||0)}</span></div>
+        <div class="receipt-line"><span class="rk">Shipping (${shipLabel})</span><span>$${money(d.shippingCost||0)}</span></div>
         <div class="receipt-line"><span class="rk">Total Paid</span><span>$${money(d.totalAmount)}</span></div>
       </div>
     </div>
-    <div style="text-align:center;margin-top:12px;"><span class="ship-badge">📦 Ships in ~${d.shippingDays||7} business days</span></div>`;
+    <div style="font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:12px 0 8px;">📦 Shipment Tracking</div>
+    ${renderTrackingSteps(trackData)}
+    <div style="text-align:center;margin-top:4px;">
+      <span class="ship-badge">📦 ${shipLabel} shipping · arrives in ~${shippingDays} business days</span>
+    </div>`;
+}
+
+function renderReceipt(d){
+  renderReceiptInto($id('payBody'), d);
 }
 
 async function uploadAuctionItem(){
@@ -1223,6 +1391,9 @@ function sseConnect(userId, auctionId) {
   const url = auctionId
     ? `/api/notifications/subscribe?userId=${userId}&auctionId=${auctionId}`
     : `/api/notifications/subscribe?userId=${userId}`;
+  // Show the URL in the test panel
+  const urlDisplay = $id('sseUrlDisplay');
+  if(urlDisplay) urlDisplay.textContent = url;
   sseConn = new EventSource(url);
   sseConn.addEventListener('connected', () => setSseDot(true));
   sseConn.addEventListener('BID_PLACED', e => {
@@ -1241,21 +1412,27 @@ function sseConnect(userId, auctionId) {
   sseConn.addEventListener('AUCTION_ENDED', e => {
     const d=JSON.parse(e.data), p=d.data, u=getUser();
     const isWinner=u&&String(p.winnerId)===String(u.userId||u.id);
-    if(isWinner){
-      pushNotif('ended','🏆 You won the auction!',`${p.itemName} — final price $${Number(p.finalPrice).toFixed(2)}. Pay now!`);
-      // Big persistent toast for winner — stays for 10 seconds
-      toast('success',`🏆 You won ${p.itemName}! Final price $${Number(p.finalPrice).toFixed(2)} — scroll down to pay!`, 10000);
-      // Force-refresh selected panel and payment form immediately
+    const isSeller=(u?.role||'').toUpperCase()==='SELLER';
+    const isMyItem=isSeller && p.sellerId && String(p.sellerId)===String(u.userId||u.id);
+    if(isMyItem){
+      // Seller notification: item sold
+      if(p.winnerId){
+        pushNotif('ended','🎉 Your item sold!',`${p.itemName} sold for $${Number(p.finalPrice).toFixed(2)}. Prepare it for shipment once buyer pays.`);
+        toast('success',`🎉 Your item "${p.itemName}" sold for $${Number(p.finalPrice).toFixed(2)}!`, 8000);
+      } else {
+        pushNotif('ended','📦 Auction ended with no bids',`${p.itemName} received no bids and has closed.`);
+        toast('info',`Your auction for "${p.itemName}" ended with no bids.`);
+      }
+    } else if(isWinner){
+      pushNotif('ended','🏆 You won the auction!',`${p.itemName} final price $${Number(p.finalPrice).toFixed(2)}. Pay now!`);
+      toast('success',`🏆 You won ${p.itemName}! Final price $${Number(p.finalPrice).toFixed(2)} scroll down to pay!`, 10000);
       if(currentSel&&currentSel.auction_id==p.auctionId){
-        restoreSel().then(()=>{
-          // Force re-render payment panel even if form is showing
-          if(currentSel) renderPayPanel(currentSel);
-        });
+        restoreSel().then(()=>{ if(currentSel) renderPayPanel(currentSel); });
       }
     } else if(u && p.outbidUserId && String(p.outbidUserId)===String(u.userId||u.id)){
-      pushNotif('ended','😔 You did not win',`${p.itemName} — won by another bidder at $${Number(p.finalPrice).toFixed(2)}`);
+      pushNotif('ended','😔 You did not win',`${p.itemName} was won by another bidder at $${Number(p.finalPrice).toFixed(2)}`);
       toast('info',`Auction over: you did not win ${p.itemName}.`);
-    } else {
+    } else if(!isSeller){
       pushNotif('ended','🔔 Auction ended',`${p.itemName} closed at $${Number(p.finalPrice).toFixed(2)}`);
       toast('info',`Auction ended: ${p.itemName} ($${Number(p.finalPrice).toFixed(2)})`);
     }
@@ -1263,15 +1440,29 @@ function sseConnect(userId, auctionId) {
     loadCatalogue();
   });
   sseConn.addEventListener('AUCTION_CREATED', e => {
-    const d=JSON.parse(e.data), p=d.data;
-    pushNotif('created','🆕 New auction listed',`${p.itemName} — starting at $${Number(p.startingPrice).toFixed(2)}`);
-    toast('info',`New auction: ${p.itemName} — starting at $${Number(p.startingPrice).toFixed(2)}`);
+    const d=JSON.parse(e.data), p=d.data, u=getUser();
+    const isSeller=(u?.role||'').toUpperCase()==='SELLER';
+    const isMyItem=isSeller && p.sellerId && String(p.sellerId)===String(u.userId||u.id);
+    if(isMyItem){
+      pushNotif('created','✅ Your auction is live!',`${p.itemName} is now live starting at $${Number(p.startingPrice).toFixed(2)}`);
+      toast('success',`Your auction for "${p.itemName}" is now live!`);
+    } else {
+      pushNotif('created','🆕 New auction listed',`${p.itemName} starting at $${Number(p.startingPrice).toFixed(2)}`);
+      toast('info',`New auction: ${p.itemName} starting at $${Number(p.startingPrice).toFixed(2)}`);
+    }
     loadCatalogue();
   });
   sseConn.addEventListener('PAYMENT_CONFIRMED', e => {
-    const d=JSON.parse(e.data), p=d.data;
-    pushNotif('payment','✅ Payment confirmed',`${p.itemName} — $${Number(p.totalAmount).toFixed(2)} paid. Ships in ${p.shippingDays} day(s).`);
-    toast('success',`Payment confirmed for ${p.itemName}!`);
+    const d=JSON.parse(e.data), p=d.data, u=getUser();
+    const isSeller=(u?.role||'').toUpperCase()==='SELLER';
+    const isMyItem=isSeller && p.sellerId && String(p.sellerId)===String(u.userId||u.id);
+    if(isMyItem){
+      pushNotif('payment','💳 Payment received!',`Buyer paid $${Number(p.totalAmount).toFixed(2)} for ${p.itemName}. Please ship within 2 business days.`);
+      toast('success',`Payment received for "${p.itemName}"! Please prepare shipment.`, 8000);
+    } else {
+      pushNotif('payment','✅ Payment confirmed',`${p.itemName} $${Number(p.totalAmount).toFixed(2)} paid. Ships in ${p.shippingDays} day(s).`);
+      toast('success',`Payment confirmed for ${p.itemName}!`);
+    }
   });
   sseConn.onerror = () => {
     setSseDot(false);
@@ -1288,6 +1479,32 @@ function setSseDot(live){
   if(dot)  dot.classList.toggle('live',live);
   if(label)label.textContent=live?'live':'offline';
   if(nd)   nd.classList.toggle('live',live);
+  const badge=$id('sseStatusBadge');
+  if(badge){
+    badge.textContent = live ? 'Connected ✓' : 'Offline';
+    badge.style.background = live ? '#dcfce7' : '#fee2e2';
+    badge.style.color = live ? '#15803d' : '#b91c1c';
+  }
+}
+
+// ─── NOTIFICATION TEST HELPERS ─────────────────────────────────────────────
+function testNotifBid(){
+  const item = currentSel?.item_name || 'Sony WH-1000XM5';
+  const price = (currentSel?.current_price || 350) + 10;
+  pushNotif('bid','💰 New bid placed (TEST)',`${item}: $${price.toFixed(2)} (simulated)`);
+  toast('info',`[TEST] New bid on ${item}: $${price.toFixed(2)}`);
+}
+function testNotifEnd(){
+  const item = currentSel?.item_name || 'Demo Item';
+  const price = currentSel?.current_price || 350;
+  pushNotif('ended','🏆 You won the auction! (TEST)',`${item} — final price $${Number(price).toFixed(2)}. Pay now!`);
+  toast('success',`[TEST] 🏆 You won ${item}! Final price $${Number(price).toFixed(2)}`, 6000);
+}
+function recheckSse(){
+  const u = getUser();
+  if(!u){ toast('error','Sign in first'); return; }
+  sseConnect(u.userId||u.id, currentSel?.auction_id);
+  toast('info','SSE reconnecting…');
 }
 
 // ─── NOTIFICATION PANEL ───────────────────────────────────────────────────────
@@ -1299,13 +1516,26 @@ function pushNotif(type,title,msg){
   const n={id:Date.now(),type,title,msg,ts:new Date(),unread:true};
   notifications.unshift(n); if(notifications.length>50) notifications.pop();
   unreadCount++; updateBadge(); if(notifOpen) renderNotifList();
-  const bell=$id('notifBell'); bell.classList.remove('ring'); void bell.offsetWidth; bell.classList.add('ring');
-  setTimeout(()=>bell.classList.remove('ring'),600);
+  bellShake();
 }
 function updateBadge(){
   const badge=$id('notifBadge');
-  if(unreadCount>0){ badge.textContent=unreadCount>99?'99+':unreadCount; badge.classList.add('show'); }
-  else badge.classList.remove('show');
+  if(!badge) return;
+  if(unreadCount>0){
+    badge.textContent=unreadCount>99?'99+':unreadCount;
+    badge.style.display='flex';
+  } else {
+    badge.style.display='none';
+  }
+}
+function bellShake(){
+  const bell=$id('notifBell');
+  if(!bell) return;
+  bell.style.animation='none';
+  // Force reflow then apply shake
+  void bell.offsetWidth;
+  bell.style.animation='bellShakeTop .5s ease';
+  setTimeout(()=>{ bell.style.animation=''; }, 600);
 }
 function clearNotifications(){ notifications=[]; unreadCount=0; updateBadge(); renderNotifList(); }
 function renderNotifList(){

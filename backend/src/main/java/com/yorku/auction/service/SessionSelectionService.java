@@ -28,8 +28,8 @@ public class SessionSelectionService {
 
     public Optional<Map<String, Object>> getSelection(String sessionId) {
         String sql = """
-            SELECT a.auction_id, a.item_id, a.current_price, a.status, a.highest_bidder_id,
-                   a.end_time, ci.item_name, ci.shipping_price, ci.expedited_shipping_price,
+            SELECT a.auction_id, a.item_id, a.seller_id, a.current_price, a.status, a.highest_bidder_id,
+                   a.end_time, ci.item_name, ci.description, ci.shipping_price, ci.expedited_shipping_price,
                    ci.shipping_days, u.first_name || ' ' || u.last_name as seller_name
             FROM session_selection ss
             JOIN auctions a ON ss.selected_auction_id = a.auction_id
